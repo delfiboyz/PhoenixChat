@@ -3,3 +3,7 @@ build/
 local.properties
 *.keystore
 keystore.properties
+upload.properties
+*.zip
+pepk*.jar
+*.pem

@@ -4,6 +4,8 @@ import { t } from '../i18n.js';
 import { Avatar, Icon, Modal, android, formatBytes, saveBlob } from '../ui.jsx';
 import { LangPicker, RestoreModal } from './Start.jsx';
 
+const PRIVACY_URL = 'https://delfiboyz.github.io/PhoenixChat/privacy/';
+
 const LIMITS = [
   { id: '5', label: '5 MB' },
   { id: '25', label: '25 MB' },
@@ -280,6 +282,16 @@ export default function Settings({ status, rev, go, toast, refresh, lang, onLang
           </div>
         </div>
 
+        <div className="group">
+          <h2 className="section-label">{t('set.about')}</h2>
+          <div className="card" style={{ overflow: 'hidden' }}>
+            <button type="button" className="list-btn" onClick={() => setModal('privacy')}>
+              <Icon.lock size={20} />
+              <span className="t"><strong>{t('set.privacy.title')}</strong><span>{t('set.privacy.note')}</span></span>
+            </button>
+          </div>
+        </div>
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <p style={{ margin: '0 4px', fontSize: 13, lineHeight: 1.5, color: 'var(--muted-2)' }}>{t('set.noRecovery')}</p>
           <button type="button" className="btn btn-danger" onClick={() => setModal('wipe')}>{t('set.wipe')}</button>
@@ -289,6 +301,15 @@ export default function Settings({ status, rev, go, toast, refresh, lang, onLang
       {modal === 'export' && <ExportModal onClose={() => setModal(null)} toast={toast} />}
       {modal === 'move' && <ExportModal onClose={() => setModal(null)} toast={toast} intro={t('set.moveIntro')} />}
       {modal === 'pin' && <PinModal onClose={() => setModal(null)} onDone={(v) => { setS(v); setModal(null); toast(t('pin.on')); }} />}
+      {modal === 'privacy' && (
+        <Modal title={t('set.privacy.title')} onClose={() => setModal(null)}>
+          {['privacy.p1', 'privacy.p2', 'privacy.p3'].map((k) => <p key={k}>{t(k)}</p>)}
+          <p style={{ overflowWrap: 'anywhere' }}>{t('privacy.p4', { url: PRIVACY_URL })}</p>
+          <div className="modal-actions">
+            <button type="button" className="btn btn-primary" onClick={() => setModal(null)}>{t('common.close')}</button>
+          </div>
+        </Modal>
+      )}
       {modal === 'wipe' && (
         <Modal title={t('wipe.title')} onClose={() => setModal(null)}>
           <p>{t('wipe.body1', { id: status.me.deviceId })}</p>

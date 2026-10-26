@@ -7,10 +7,13 @@ plugins {
 }
 
 // Kunci rilis opsional: android/keystore.properties (storeFile, storePassword, keyAlias, keyPassword).
-val keystoreProps = Properties().apply {
-    val f = rootProject.file("keystore.properties")
+// Untuk Play dengan kunci upload terpisah: android/upload.properties (format sama), lalu
+// `./gradlew bundleRelease -PplayUpload`. Lihat docs/play/signing.md.
+fun loadProps(name: String) = Properties().apply {
+    val f = rootProject.file(name)
     if (f.exists()) f.inputStream().use { load(it) }
 }
+val keystoreProps = if (project.hasProperty("playUpload")) loadProps("upload.properties") else loadProps("keystore.properties")
 
 android {
     namespace = "app.chatlokal"
@@ -97,8 +100,10 @@ val copyWebUi = tasks.register<CopyWebUi>("copyWebUi") {
     outputDir.set(layout.buildDirectory.dir("generated/webui"))
 }
 
-// versionCode per arsitektur (versionCode×10 + kode ABI), agar F-Droid dan Play bisa
-// membedakan APK split: universal=0, armeabi-v7a=1, arm64-v8a=2, x86_64=3.
+// versionCode = versionCode×10 + kode: armeabi-v7a=1, arm64-v8a=2, x86_64=3 (APK split untuk
+// GitHub/F-Droid), dan 9 untuk build tanpa filter ABI (APK universal dan App Bundle Play).
+// Kode 9 membuat build Play selalu lebih baru dari APK split versi yang sama, sehingga
+// pengguna bisa pindah dari F-Droid/GitHub ke Play; versi berikutnya (×10) tetap lebih besar.
 val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86_64" to 3)
 
 androidComponents {
@@ -107,7 +112,7 @@ androidComponents {
         variant.outputs.forEach { output ->
             val abi = output.filters.find { it.filterType == FilterConfiguration.FilterType.ABI }?.identifier
             val base = output.versionCode.get() ?: 1
-            output.versionCode.set(base * 10 + (abiCodes[abi] ?: 0))
+            output.versionCode.set(base * 10 + (abiCodes[abi] ?: 9))
         }
     }
 }
