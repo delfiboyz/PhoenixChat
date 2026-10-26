@@ -1,0 +1,31 @@
+{
+  "name": "chat-lokal",
+  "version": "0.1.0",
+  "description": "Chat tanpa akun dan tanpa database: data di perangkat, pesan langsung antar perangkat lewat Tor.",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "build": "vite build",
+    "start": "npm run build && electron .",
+    "electron": "electron .",
+    "serve": "node server/cli.js",
+    "dev:ui": "vite",
+    "dev:a": "node server/cli.js --profile a --no-tor --ui-port 5301",
+    "dev:b": "node server/cli.js --profile b --no-tor --ui-port 5302"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "socks-proxy-agent": "^8.0.5",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {
+    "@fontsource/bricolage-grotesque": "^5.1.0",
+    "@fontsource/ibm-plex-mono": "^5.1.0",
+    "@fontsource/ibm-plex-sans": "^5.1.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^38.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^6.0.0"
+  }
+}

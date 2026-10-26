@@ -1,0 +1,142 @@
+// Menjalankan Tor tertanam: satu proses tor per perangkat, dengan layanan onion
+// sendiri yang meneruskan port 80 ke server peer lokal.
+import { spawn, execFileSync } from 'node:child_process';
+import { EventEmitter } from 'node:events';
+import fs from 'node:fs';
+import path from 'node:path';
+
+function which(bin) {
+  try {
+    return execFileSync('which', [bin], { encoding: 'utf8' }).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+export class Tor extends EventEmitter {
+  constructor({ dataDir, peerPort, socksPort, torPath }) {
+    super();
+    this.dir = path.join(dataDir, 'tor');
+    this.peerPort = peerPort;
+    this.socksPort = socksPort;
+    this.torPath = torPath || process.env.TOR_PATH || which('tor');
+    this.state = { phase: 'idle', progress: 0, error: null, address: null };
+    this.proc = null;
+  }
+
+  set(patch) {
+    this.state = { ...this.state, ...patch };
+    this.emit('state', this.state);
+  }
+
+  torrc(bridge) {
+    const lines = [
+      `DataDirectory ${path.join(this.dir, 'data')}`,
+      `SocksPort 127.0.0.1:${this.socksPort}`,
+      'ControlPort 0',
+      'Log notice stdout',
+      `HiddenServiceDir ${path.join(this.dir, 'hs')}`,
+      'HiddenServiceVersion 3',
+      `HiddenServicePort 80 127.0.0.1:${this.peerPort}`,
+    ];
+    if (bridge && bridge.type !== 'none') {
+      const lines2 = (bridge.lines || '').split('\n').map((l) => l.trim()).filter(Boolean);
+      const exe = bridge.type === 'snowflake' ? which('snowflake-client') : (which('lyrebird') || which('obfs4proxy'));
+      if (!exe) throw new Error(`Program bridge ${bridge.type} tidak ditemukan di sistem`);
+      if (!lines2.length) throw new Error('Alamat bridge belum diisi');
+      lines.push('UseBridges 1', `ClientTransportPlugin ${bridge.type} exec ${exe}`);
+      for (const l of lines2) lines.push(`Bridge ${l.replace(/^Bridge\s+/i, '')}`);
+    }
+    return lines.join('\n') + '\n';
+  }
+
+  start(bridge) {
+    this.stop();
+    if (!this.torPath) {
+      this.set({ phase: 'error', error: 'Program tor tidak ditemukan. Pasang paket tor terlebih dahulu.' });
+      return;
+    }
+    fs.mkdirSync(path.join(this.dir, 'hs'), { recursive: true, mode: 0o700 });
+    fs.chmodSync(path.join(this.dir, 'hs'), 0o700);
+    let rc;
+    try {
+      rc = this.torrc(bridge);
+    } catch (e) {
+      this.set({ phase: 'error', error: e.message });
+      return;
+    }
+    fs.writeFileSync(path.join(this.dir, 'torrc'), rc);
+    this.set({ phase: 'connecting', progress: 0, error: null });
+    const proc = spawn(this.torPath, ['-f', path.join(this.dir, 'torrc')], { stdio: ['ignore', 'pipe', 'pipe'] });
+    this.proc = proc;
+    let buf = '';
+    const onData = (d) => {
+      buf += d.toString();
+      let i;
+      while ((i = buf.indexOf('\n')) >= 0) {
+        this.line(buf.slice(0, i));
+        buf = buf.slice(i + 1);
+      }
+    };
+    proc.stdout.on('data', onData);
+    proc.stderr.on('data', onData);
+    proc.on('exit', (code) => {
+      if (this.proc !== proc) return;
+      this.proc = null;
+      if (this.state.phase !== 'stopped') {
+        this.set({ phase: 'error', error: `Tor berhenti (kode ${code}). Periksa koneksi internet atau aktifkan bridge.` });
+      }
+    });
+    // Bootstrap yang macet terlalu lama dianggap gagal.
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      if (this.state.phase === 'connecting') {
+        this.set({ phase: 'error', error: 'Tidak bisa terhubung ke jaringan Tor. Periksa koneksi internet atau aktifkan bridge.' });
+      }
+    }, 120000);
+  }
+
+  line(l) {
+    const m = l.match(/Bootstrapped (\d+)%/);
+    if (m) {
+      const progress = Number(m[1]);
+      if (progress >= 100) {
+        clearTimeout(this.timer);
+        this.set({ phase: 'ready', progress, address: this.address() });
+      } else {
+        this.set({ progress });
+      }
+    }
+    if (/\[err\]/.test(l)) this.set({ phase: 'error', error: l.replace(/^.*\[err\]\s*/, '') });
+  }
+
+  // Alamat .onion v3 dibuat tor dari kunci di folder hs.
+  address() {
+    try {
+      return fs.readFileSync(path.join(this.dir, 'hs', 'hostname'), 'utf8').trim();
+    } catch {
+      return null;
+    }
+  }
+
+  stop() {
+    clearTimeout(this.timer);
+    if (this.proc) {
+      const p = this.proc;
+      this.proc = null;
+      this.set({ phase: 'stopped' });
+      p.kill('SIGTERM');
+    }
+  }
+
+  // Tor menulis kunci layanan onion saat pertama berjalan; tunggu file hostname.
+  async waitAddress(ms = 30000) {
+    const end = Date.now() + ms;
+    while (Date.now() < end) {
+      const a = this.address();
+      if (a) return a;
+      await new Promise((r) => setTimeout(r, 200));
+    }
+    return null;
+  }
+}
