@@ -2,3 +2,11 @@ node_modules/
 dist/
 .data/
 release/
+# Repo F-Droid: hanya metadata yang masuk git; kunci, config, dan APK tidak.
+fdroid/config.yml
+fdroid/keystore.p12
+fdroid/repo/
+fdroid/archive/
+fdroid/tmp/
+fdroid/.cache/
+fdroid/icon.png

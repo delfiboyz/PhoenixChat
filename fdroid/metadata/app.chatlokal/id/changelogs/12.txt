@@ -1,0 +1,1 @@
+Rilis pertama: chat tanpa akun lewat Tor, bahasa Indonesia dan Inggris, tampilan gelap.

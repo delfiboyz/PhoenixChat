@@ -1,0 +1,22 @@
+Phoenix Chat lets you chat without an account, a phone number, or an email address. Your identity is a random key created on your device, your messages are stored only on your devices, and they travel directly between devices over the Tor network.
+
+<b>How it works</b>
+<ul>
+<li>Each device runs its own Tor onion service. Messages go straight to your friend's device, end-to-end encrypted, and your IP address stays hidden.</li>
+<li>There is no user directory. You add a contact by scanning their QR code or pasting their code, and you approve every new contact.</li>
+<li>When a friend is offline, messages wait in a queue on your device and are delivered automatically when you are both online.</li>
+<li>Status labels tell you where each message is: <i>Saved locally</i>, <i>Queued</i>, <i>Sent</i>, or <i>Read</i>.</li>
+</ul>
+
+<b>Features</b>
+<ul>
+<li>Attachments with a size limit you choose.</li>
+<li>Password-encrypted backups you can restore on a new device (also works with the Linux desktop app).</li>
+<li>PIN lock, automatic deletion after 30 days, optional read receipts.</li>
+<li>obfs4 and Snowflake bridges for networks that block Tor.</li>
+<li>Battery saver: turn off background Tor if you only want messages while the app is open.</li>
+<li>English and Indonesian, dark theme.</li>
+</ul>
+
+<b>Good to know</b>
+Because there is no server, there is no account recovery. If you lose your device without a backup, your messages are gone. Messages are received only while Phoenix Chat is running; with battery saver off, a foreground notification keeps Tor running in the background.

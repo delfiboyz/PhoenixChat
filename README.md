@@ -6,10 +6,26 @@ Desain mengikuti canvas "Desain Aplikasi Chat Lokal" (5 layar) dan arsitektur me
 
 ## Unduh
 
-File siap pakai ada di halaman [Releases](https://github.com/delfiboyz/PhoenixChat/releases):
+### F-Droid
+
+Phoenix Chat punya repo F-Droid sendiri, jadi pembaruan datang otomatis lewat aplikasi [F-Droid](https://f-droid.org):
+
+1. Di F-Droid buka **Pengaturan → Repositori → +** (atau pindai kode QR di bawah).
+2. Masukkan alamat `https://delfiboyz.github.io/PhoenixChat/fdroid/repo`
+3. Pastikan sidik jari repo: `AB9796E00CCE332F3D4ED053C5FDF6488714A5B48B172B4522F64CA30ADAFB39`
+
+<img src="docs/fdroid-repo-qr.png" alt="Kode QR repo F-Droid Phoenix Chat" width="180">
+
+Phoenix Chat belum ada di repo utama F-Droid: aplikasi ini memakai pustaka dengan biner native jadi (tor-android, IPtProxy, libsodium) yang belum memenuhi kebijakan build-dari-sumber F-Droid.
+
+### Unduh langsung
+
+File siap pakai juga ada di halaman [Releases](https://github.com/delfiboyz/PhoenixChat/releases):
 
 - **Android**: `PhoenixChat-<versi>-android-arm64-v8a.apk` untuk kebanyakan ponsel (ada juga `armeabi-v7a`, `x86_64`, dan `universal`). Sidik jari SHA-256 sertifikat penandatangan tercantum di catatan rilis.
 - **Linux**: `PhoenixChat-<versi>-x86_64.AppImage`. Butuh program `tor` di sistem (`apt install tor`). Jalankan dengan `chmod +x PhoenixChat-*.AppImage && ./PhoenixChat-*.AppImage`.
+
+Memperbarui repo F-Droid setelah membangun APK rilis: `scripts/publish-fdroid.sh` (butuh `fdroidserver` dan `fdroid/config.yml` + `fdroid/keystore.p12`, yang tidak ikut git). Metadata aplikasinya ada di `fdroid/metadata/`.
 
 Membangun sendiri: `npm run dist:linux` untuk AppImage (hasil di `release/`), dan lihat bagian Android di bawah untuk APK.
 
@@ -114,3 +130,7 @@ src/                   antarmuka React: Mulai, Obrolan, Ruang obrolan, Tambah ko
 - Bridge butuh alamat bridge yang kamu isi sendiri (dari bridges.torproject.org); aplikasi tidak menyertakan daftar bawaan.
 - Pesan hanya diterima selama aplikasi berjalan, karena tidak ada server yang menampung pesan. Di Android, ini berarti selama layanan foreground aktif atau aplikasi terbuka.
 - Di Android, tor-android menyimpan data jaringan Tor di folder cache. Jika penyimpanan ponsel hampir penuh, sistem bisa terus menghapus cache itu dan Tor gagal tersambung.
+
+## Lisensi
+
+Phoenix Chat adalah perangkat lunak bebas di bawah [GNU General Public License v3.0 atau yang lebih baru](LICENSE) (`GPL-3.0-or-later`).

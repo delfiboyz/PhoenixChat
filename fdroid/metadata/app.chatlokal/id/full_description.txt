@@ -1,0 +1,22 @@
+Phoenix Chat memungkinkan kamu mengobrol tanpa akun, nomor HP, atau email. Identitasmu adalah kunci acak yang dibuat di perangkat, pesan hanya disimpan di perangkatmu, dan dikirim langsung antar perangkat lewat jaringan Tor.
+
+<b>Cara kerja</b>
+<ul>
+<li>Setiap perangkat menjalankan layanan onion Tor sendiri. Pesan langsung menuju perangkat temanmu, terenkripsi ujung ke ujung, dan alamat IP-mu tetap tersembunyi.</li>
+<li>Tidak ada direktori pengguna. Kontak ditambahkan dengan memindai kode QR atau menempel kode, dan setiap kontak baru harus kamu setujui.</li>
+<li>Saat teman offline, pesan menunggu di antrean perangkatmu dan terkirim otomatis begitu kalian sama-sama online.</li>
+<li>Label status menunjukkan posisi setiap pesan: <i>Tersimpan lokal</i>, <i>Antre</i>, <i>Terkirim</i>, atau <i>Dibaca</i>.</li>
+</ul>
+
+<b>Fitur</b>
+<ul>
+<li>Lampiran dengan batas ukuran yang kamu atur sendiri.</li>
+<li>Cadangan terenkripsi kata sandi yang bisa dipulihkan di perangkat baru (juga di aplikasi desktop Linux).</li>
+<li>Kunci PIN, hapus otomatis setelah 30 hari, tanda "Dibaca" opsional.</li>
+<li>Bridge obfs4 dan Snowflake untuk jaringan yang memblokir Tor.</li>
+<li>Mode hemat baterai: matikan Tor di latar jika pesan cukup diterima saat aplikasi terbuka.</li>
+<li>Bahasa Indonesia dan Inggris, tampilan gelap.</li>
+</ul>
+
+<b>Perlu diketahui</b>
+Karena tidak ada server, tidak ada pemulihan akun. Jika perangkat hilang tanpa cadangan, pesanmu ikut hilang. Pesan hanya diterima selama Phoenix Chat berjalan; dengan mode hemat baterai mati, notifikasi layanan menjaga Tor tetap aktif di latar.
