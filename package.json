@@ -12,7 +12,8 @@
     "serve": "node server/cli.js",
     "dev:ui": "vite",
     "dev:a": "node server/cli.js --profile a --no-tor --ui-port 5301",
-    "dev:b": "node server/cli.js --profile b --no-tor --ui-port 5302"
+    "dev:b": "node server/cli.js --profile b --no-tor --ui-port 5302",
+    "dist:linux": "npm run build && electron-builder --linux AppImage"
   },
   "dependencies": {
     "qrcode": "^1.5.4",
@@ -25,8 +26,38 @@
     "@fontsource/ibm-plex-sans": "^5.1.0",
     "@vitejs/plugin-react": "^4.3.4",
     "electron": "^38.0.0",
+    "electron-builder": "^26.18.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "vite": "^6.0.0"
-  }
+  },
+  "author": {
+    "name": "delfiboyz",
+    "email": "delfiboyz@protonmail.com"
+  },
+  "homepage": "https://github.com/delfiboyz/PhoenixChat",
+  "build": {
+    "appId": "app.chatlokal.desktop",
+    "productName": "Phoenix Chat",
+    "artifactName": "PhoenixChat-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Network",
+      "icon": "electron/icon.png",
+      "synopsis": "Chat tanpa akun lewat Tor",
+      "syncDesktopName": true
+    }
+  },
+  "desktopName": "phoenix-chat.desktop"
 }

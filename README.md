@@ -4,6 +4,15 @@ Phoenix Chat adalah aplikasi chat tanpa akun dan tanpa database, dengan tampilan
 
 Desain mengikuti canvas "Desain Aplikasi Chat Lokal" (5 layar) dan arsitektur mengikuti "Dokumen Desain — Chat Lokal". Ada dua versi dengan protokol yang sama, jadi penggunanya bisa saling mengobrol: aplikasi desktop (Electron, `server/`) dan aplikasi Android (Kotlin, `android/`). Keduanya memakai antarmuka React yang sama (`src/`).
 
+## Unduh
+
+File siap pakai ada di halaman [Releases](https://github.com/delfiboyz/PhoenixChat/releases):
+
+- **Android**: `PhoenixChat-<versi>-android-arm64-v8a.apk` untuk kebanyakan ponsel (ada juga `armeabi-v7a`, `x86_64`, dan `universal`). Sidik jari SHA-256 sertifikat penandatangan tercantum di catatan rilis.
+- **Linux**: `PhoenixChat-<versi>-x86_64.AppImage`. Butuh program `tor` di sistem (`apt install tor`). Jalankan dengan `chmod +x PhoenixChat-*.AppImage && ./PhoenixChat-*.AppImage`.
+
+Membangun sendiri: `npm run dist:linux` untuk AppImage (hasil di `release/`), dan lihat bagian Android di bawah untuk APK.
+
 ## Menjalankan
 
 Butuh Node 20+ dan program `tor` di sistem (`apt install tor`). Untuk bridge, pasang juga `obfs4proxy`/`lyrebird` atau `snowflake-client`.
