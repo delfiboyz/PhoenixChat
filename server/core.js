@@ -8,6 +8,7 @@ import {
   newBoxKeys, seal, open, deviceId, encodeContactCode, decodeContactCode,
   encryptBackup, decryptBackup, hashPin, checkPin, randomId,
 } from './crypto.js';
+import { UserError, msg } from './i18n.js';
 import { Store } from './store.js';
 import { Tor } from './tor.js';
 import { Transport } from './transport.js';
@@ -23,6 +24,7 @@ const DEFAULT_SETTINGS = {
   limit: '25',
   bridge: { type: 'none', lines: '' },
   pin: null,
+  lang: null,
 };
 
 export const limitBytes = (limit) => (limit === 'none' ? Infinity : Number(limit) * MB);
@@ -55,6 +57,11 @@ export class Core extends EventEmitter {
     this.outbox = this.store.read('outbox.json', []);
   }
 
+  // Pesan untuk pengguna dalam bahasa perangkat.
+  m(key, vars) {
+    return msg(this.settings.lang, key, vars);
+  }
+
   changed(kind, cid) {
     this.emit('change', { kind, cid });
   }
@@ -76,7 +83,9 @@ export class Core extends EventEmitter {
   networkState() {
     if (!this.identity) return { phase: 'idle', progress: 0 };
     if (this.direct) return { phase: 'ready', progress: 100, direct: true };
-    return this.tor ? this.tor.state : { phase: 'idle', progress: 0 };
+    if (!this.tor) return { phase: 'idle', progress: 0 };
+    const { error } = this.tor.state;
+    return { ...this.tor.state, error: error && typeof error === 'object' ? this.m(error.key, error.vars) : error };
   }
 
   async startNetwork() {
@@ -109,6 +118,7 @@ export class Core extends EventEmitter {
     const addr = this.address();
     return {
       onboarded: Boolean(this.identity),
+      lang: this.settings.lang || null,
       locked: this.locked,
       network: this.networkState(),
       me: this.identity && {
@@ -122,9 +132,9 @@ export class Core extends EventEmitter {
   }
 
   async onboard(name) {
-    if (this.identity) throw new Error('Identitas sudah ada');
+    if (this.identity) throw new UserError('identityExists');
     const clean = String(name || '').trim().slice(0, 40);
-    if (!clean) throw new Error('Isi nama panggilan');
+    if (!clean) throw new UserError('nameRequired');
     this.identity = { name: clean, box: newBoxKeys(), peerPort: this.peerPort, createdAt: Date.now() };
     this.store.write('identity.json', this.identity);
     this.saveSettings();
@@ -134,7 +144,7 @@ export class Core extends EventEmitter {
 
   setName(name) {
     const clean = String(name || '').trim().slice(0, 40);
-    if (!clean) throw new Error('Nama tidak boleh kosong');
+    if (!clean) throw new UserError('nameEmpty');
     this.identity.name = clean;
     this.store.write('identity.json', this.identity);
     this.changed('me');
@@ -143,7 +153,7 @@ export class Core extends EventEmitter {
   // ---------- kunci PIN (hanya di antarmuka) ----------
 
   unlock(pin) {
-    if (!checkPin(pin, this.settings.pin)) throw new Error('PIN salah');
+    if (!checkPin(pin, this.settings.pin)) throw new UserError('wrongPin');
     this.locked = false;
   }
 
@@ -151,7 +161,7 @@ export class Core extends EventEmitter {
     if (pin === null) {
       this.settings.pin = null;
     } else {
-      if (!/^\d{4,8}$/.test(String(pin))) throw new Error('PIN harus 4–8 angka');
+      if (!/^\d{4,8}$/.test(String(pin))) throw new UserError('pinFormat');
       this.settings.pin = hashPin(pin);
     }
     this.saveSettings();
@@ -183,9 +193,9 @@ export class Core extends EventEmitter {
 
   addContact(code) {
     const c = decodeContactCode(code);
-    if (!c) throw new Error('Kode tidak dikenali');
-    if (c.publicKey === this.identity.box.publicKey) throw new Error('Ini kode milikmu sendiri');
-    if (!this.direct && !/^[a-z2-7]{56}\.onion$/.test(c.address)) throw new Error('Alamat .onion tidak valid');
+    if (!c) throw new UserError('badCode');
+    if (c.publicKey === this.identity.box.publicKey) throw new UserError('ownCode');
+    if (!this.direct && !/^[a-z2-7]{56}\.onion$/.test(c.address)) throw new UserError('badOnion');
     const contact = this.upsertContact(c, 'ok');
     this.enqueue(contact.id, { t: 'hello' });
     this.changed('contacts', contact.id);
@@ -194,7 +204,7 @@ export class Core extends EventEmitter {
 
   acceptContact(cid) {
     const c = this.contacts[cid];
-    if (!c) throw new Error('Kontak tidak ada');
+    if (!c) throw new UserError('noContact');
     c.status = 'ok';
     this.saveContacts();
     this.enqueue(cid, { t: 'hello' });
@@ -203,7 +213,7 @@ export class Core extends EventEmitter {
 
   blockContact(cid) {
     const c = this.contacts[cid];
-    if (!c) throw new Error('Kontak tidak ada');
+    if (!c) throw new UserError('noContact');
     c.status = 'blocked';
     this.outbox = this.outbox.filter((o) => o.cid !== cid);
     this.saveOutbox();
@@ -231,7 +241,7 @@ export class Core extends EventEmitter {
         const hit = !q || c.name.toLowerCase().includes(q) || msgs.some((m) => (m.text || '').toLowerCase().includes(q));
         return hit && {
           id: c.id, name: c.name, color: c.color, status: c.status, unread: c.unread, online: c.online,
-          last: last ? (last.mine ? 'Kamu: ' : '') + (last.file ? `Lampiran: ${last.file.name}` : last.text) : null,
+          last: last ? { mine: Boolean(last.mine), text: last.text || '', file: last.file ? last.file.name : null } : null,
           ts: last ? last.ts : c.createdAt,
           queued: msgs.some((m) => m.mine && (m.status === 'queued' || m.status === 'local')),
         };
@@ -242,7 +252,7 @@ export class Core extends EventEmitter {
 
   chat(cid) {
     const c = this.contacts[cid];
-    if (!c) throw new Error('Obrolan tidak ada');
+    if (!c) throw new UserError('noChat');
     // Cek apakah teman sedang online, paling sering tiap 30 detik.
     if (c.status === 'ok' && this.transport && Date.now() - c.lastCheck > 30000) {
       c.lastCheck = Date.now();
@@ -297,9 +307,9 @@ export class Core extends EventEmitter {
 
   send(cid, text) {
     const c = this.contacts[cid];
-    if (!c || c.status !== 'ok') throw new Error('Kontak belum disetujui');
+    if (!c || c.status !== 'ok') throw new UserError('notApproved');
     const body = String(text || '').trim().slice(0, 8000);
-    if (!body) throw new Error('Pesan kosong');
+    if (!body) throw new UserError('emptyMessage');
     const msg = { id: randomId(), mine: true, text: body, ts: Date.now(), status: 'local' };
     this.addMessage(cid, msg);
     this.enqueue(cid, { t: 'msg', id: msg.id, text: body, ts: msg.ts }, msg.id);
@@ -308,7 +318,7 @@ export class Core extends EventEmitter {
 
   sendFile(cid, name, mime, buf) {
     const c = this.contacts[cid];
-    if (!c || c.status !== 'ok') throw new Error('Kontak belum disetujui');
+    if (!c || c.status !== 'ok') throw new UserError('notApproved');
     const id = randomId();
     this.store.writeBlob(id, buf);
     const file = { id, name: String(name).slice(0, 120), mime: String(mime || 'application/octet-stream'), size: buf.length, state: 'have' };
@@ -321,7 +331,7 @@ export class Core extends EventEmitter {
   // Lampiran besar tidak diunduh otomatis; pengguna memintanya manual.
   requestFile(cid, id) {
     const c = this.contacts[cid];
-    if (!c || c.status !== 'ok') throw new Error('Kontak belum disetujui');
+    if (!c || c.status !== 'ok') throw new UserError('notApproved');
     this.fileRequests.add(id);
     this.updateMessage(cid, id, (m) => ({ file: { ...m.file, state: 'downloading' } }));
     this.enqueue(cid, { t: 'file-req', id });
@@ -370,7 +380,7 @@ export class Core extends EventEmitter {
         if (item.msgId) {
           const wasQueued = this.messages(cid).find((m) => m.id === item.msgId)?.status === 'queued';
           this.updateMessage(cid, item.msgId, (m) => (m.status === 'read' ? {} : { status: 'sent' }));
-          if (wasQueued) this.emit('notify', { title: c.name, body: 'Pesan dari antrean sudah terkirim' });
+          if (wasQueued) this.emit('notify', { title: c.name, body: this.m('notifyQueueSent') });
         }
       }
     } finally {
@@ -401,7 +411,7 @@ export class Core extends EventEmitter {
     if (!c) {
       // Orang yang belum ada di kontak: jadi permintaan yang harus disetujui.
       c = this.upsertContact({ name: String(p.me.name || '').slice(0, 40), address: p.me.address, publicKey: env.from }, 'pending');
-      this.emit('notify', { title: 'Permintaan kontak', body: `${c.name} ingin mengobrol` });
+      this.emit('notify', { title: this.m('notifyRequestTitle'), body: this.m('notifyRequestBody', { name: c.name }) });
     } else if (p.me.name && p.me.name !== c.name) {
       c.name = String(p.me.name).slice(0, 40);
     }
@@ -426,7 +436,7 @@ export class Core extends EventEmitter {
         const file = { id: String(p.id), name: String(p.name || 'file').slice(0, 120), mime: String(p.mime || ''), size, state: auto ? 'downloading' : 'offered' };
         this.addMessage(cid, { id: file.id, mine: false, text: '', file, ts: Number(p.ts) || Date.now() });
         c.unread = (c.unread || 0) + 1;
-        this.emit('notify', { title: c.name, body: `Lampiran: ${file.name}` });
+        this.emit('notify', { title: c.name, body: this.m('notifyAttachment', { name: file.name }) });
         if (auto) {
           this.fileRequests.add(file.id);
           this.outbox.push({ oid: randomId(), cid, payload: { t: 'file-req', id: file.id }, msgId: null });
@@ -476,9 +486,10 @@ export class Core extends EventEmitter {
   }
 
   patchSettings(patch) {
-    const allowed = ['autoDelete', 'readReceipts', 'battery', 'limit', 'bridge'];
+    const allowed = ['autoDelete', 'readReceipts', 'battery', 'limit', 'bridge', 'lang'];
     for (const k of allowed) if (k in patch) this.settings[k] = patch[k];
     if (!['5', '25', '100', 'none'].includes(this.settings.limit)) this.settings.limit = '25';
+    if (!['id', 'en'].includes(this.settings.lang)) this.settings.lang = null;
     this.saveSettings();
     if ('bridge' in patch) this.restartNetwork();
     if (patch.autoDelete) this.sweep();
@@ -500,7 +511,7 @@ export class Core extends EventEmitter {
   }
 
   exportBackup(password) {
-    if (!password || String(password).length < 8) throw new Error('Kata sandi minimal 8 karakter');
+    if (!password || String(password).length < 8) throw new UserError('shortPassword');
     const hsDir = path.join(this.dataDir, 'tor', 'hs');
     const hs = {};
     if (fs.existsSync(hsDir)) {
@@ -525,7 +536,7 @@ export class Core extends EventEmitter {
 
   async restore(buf, password) {
     const data = JSON.parse(decryptBackup(buf, String(password)).toString('utf8'));
-    if (data.v !== 1 || !data.identity) throw new Error('Isi cadangan tidak valid');
+    if (data.v !== 1 || !data.identity) throw new UserError('badBackup');
     this.tor?.stop();
     this.tor = null;
     this.store.wipe();
@@ -545,10 +556,13 @@ export class Core extends EventEmitter {
   }
 
   wipe() {
+    const { lang } = this.settings;
     this.tor?.stop();
     this.tor = null;
     this.transport = null;
     this.store.wipe();
+    // Bahasa tetap dipakai di layar Mulai setelah semua data dihapus.
+    if (lang) this.store.write('settings.json', { lang });
     this.load();
     this.locked = false;
     this.changed('me');

@@ -14,7 +14,8 @@ class ChatService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val type = if (Build.VERSION.SDK_INT >= 34) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
-        ServiceCompat.startForeground(this, Notifier.SERVICE_ID, Notifier.service(this), type)
+        val lang = (application as ChatLokalApp).core.lang()
+        ServiceCompat.startForeground(this, Notifier.SERVICE_ID, Notifier.service(this, lang), type)
         return START_STICKY
     }
 }

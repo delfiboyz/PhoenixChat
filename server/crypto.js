@@ -1,6 +1,7 @@
 // Kunci identitas, enkripsi ujung ke ujung, dan enkripsi file cadangan.
 import crypto from 'node:crypto';
 import nacl from 'tweetnacl';
+import { UserError } from './i18n.js';
 
 const b64 = (u8) => Buffer.from(u8).toString('base64');
 const unb64 = (s) => new Uint8Array(Buffer.from(s, 'base64'));
@@ -64,7 +65,7 @@ export function encryptBackup(buf, password) {
 }
 
 export function decryptBackup(buf, password) {
-  if (buf.subarray(0, 4).toString() !== 'CLB1') throw new Error('Bukan file cadangan Chat Lokal');
+  if (buf.subarray(0, 4).toString() !== 'CLB1') throw new UserError('notBackup');
   const salt = buf.subarray(4, 20);
   const iv = buf.subarray(20, 32);
   const tag = buf.subarray(32, 48);
@@ -74,7 +75,7 @@ export function decryptBackup(buf, password) {
   try {
     return Buffer.concat([d.update(buf.subarray(48)), d.final()]);
   } catch {
-    throw new Error('Kata sandi salah atau file rusak');
+    throw new UserError('wrongPassword');
   }
 }
 

@@ -21,8 +21,6 @@ interface Network {
     fun ping(address: String): Boolean
 }
 
-class UserError(message: String) : Exception(message)
-
 class Core(val dataDir: File, private val peerPort: Int, private val net: Network) {
     val store = Store(dataDir)
     var identity: JSONObject? = null
@@ -52,6 +50,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
             .put("limit", "25")
             .put("bridge", JSONObject().put("type", "none").put("lines", ""))
             .put("pin", JSONObject.NULL)
+            .put("lang", JSONObject.NULL)
 
         fun limitBytes(limit: String): Long = if (limit == "none") Long.MAX_VALUE else (limit.toLongOrNull() ?: 25) * MB
 
@@ -87,6 +86,10 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
     private fun changed(kind: String, cid: String? = null) =
         emit("change", JSONObject().put("kind", kind).put("cid", cid ?: JSONObject.NULL))
 
+    // Pesan untuk pengguna dalam bahasa perangkat.
+    fun lang(): String? = settings.optString("lang").takeIf { it == "id" || it == "en" }
+    fun m(key: String, vars: Map<String, String> = emptyMap()) = I18n.msg(lang(), key, vars)
+
     private fun notify(title: String, body: String) =
         emit("notify", JSONObject().put("title", title).put("body", body))
 
@@ -103,8 +106,13 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
 
     fun address(): String? = if (identity == null) null else net.address()
 
-    fun networkState(): JSONObject =
-        if (identity == null) JSONObject().put("phase", "idle").put("progress", 0) else net.state()
+    fun networkState(): JSONObject {
+        if (identity == null) return JSONObject().put("phase", "idle").put("progress", 0)
+        val s = net.state()
+        val err = s.optString("error")
+        if (!s.isNull("error") && I18n.has(err)) s.put("error", m(err))
+        return s
+    }
 
     fun startNetwork() {
         if (identity == null) return
@@ -131,6 +139,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
         }
         return JSONObject()
             .put("onboarded", identity != null)
+            .put("lang", lang() ?: JSONObject.NULL)
             .put("locked", locked)
             .put("network", networkState())
             .put("me", me ?: JSONObject.NULL)
@@ -139,9 +148,9 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
 
     fun onboard(name: String?) {
         synchronized(this) {
-            if (identity != null) throw UserError("Identitas sudah ada")
+            if (identity != null) throw UserError("identityExists")
             val clean = (name ?: "").trim().take(40)
-            if (clean.isEmpty()) throw UserError("Isi nama panggilan")
+            if (clean.isEmpty()) throw UserError("nameRequired")
             identity = JSONObject()
                 .put("name", clean)
                 .put("box", Crypto.newBoxKeys())
@@ -157,7 +166,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
     @Synchronized
     fun setName(name: String?) {
         val clean = (name ?: "").trim().take(40)
-        if (clean.isEmpty()) throw UserError("Nama tidak boleh kosong")
+        if (clean.isEmpty()) throw UserError("nameEmpty")
         identity!!.put("name", clean)
         saveIdentity()
         changed("me")
@@ -166,7 +175,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
     // ---------- kunci PIN (hanya di antarmuka) ----------
 
     fun unlock(pin: String?) {
-        if (!Crypto.checkPin(pin ?: "", settings.optJSONObject("pin"))) throw UserError("PIN salah")
+        if (!Crypto.checkPin(pin ?: "", settings.optJSONObject("pin"))) throw UserError("wrongPin")
         locked = false
     }
 
@@ -175,7 +184,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
         if (pin == null) {
             settings.put("pin", JSONObject.NULL)
         } else {
-            if (!Regex("^\\d{4,8}$").matches(pin)) throw UserError("PIN harus 4–8 angka")
+            if (!Regex("^\\d{4,8}$").matches(pin)) throw UserError("pinFormat")
             settings.put("pin", Crypto.hashPin(pin))
         }
         saveSettings()
@@ -212,9 +221,9 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
     }
 
     fun addContact(code: String?): JSONObject {
-        val c = Crypto.decodeContactCode(code) ?: throw UserError("Kode tidak dikenali")
-        if (c.publicKey == identity!!.getJSONObject("box").getString("publicKey")) throw UserError("Ini kode milikmu sendiri")
-        if (!Regex("^[a-z2-7]{56}\\.onion$").matches(c.address)) throw UserError("Alamat .onion tidak valid")
+        val c = Crypto.decodeContactCode(code) ?: throw UserError("badCode")
+        if (c.publicKey == identity!!.getJSONObject("box").getString("publicKey")) throw UserError("ownCode")
+        if (!Regex("^[a-z2-7]{56}\\.onion$").matches(c.address)) throw UserError("badOnion")
         val contact = upsertContact(c.name, c.address, c.publicKey, "ok")
         val cid = contact.getString("id")
         enqueue(cid, JSONObject().put("t", "hello"))
@@ -224,7 +233,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
 
     fun acceptContact(cid: String) {
         synchronized(this) {
-            val c = contact(cid) ?: throw UserError("Kontak tidak ada")
+            val c = contact(cid) ?: throw UserError("noContact")
             c.put("status", "ok")
             saveContacts()
         }
@@ -234,7 +243,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
 
     @Synchronized
     fun blockContact(cid: String) {
-        val c = contact(cid) ?: throw UserError("Kontak tidak ada")
+        val c = contact(cid) ?: throw UserError("noContact")
         c.put("status", "blocked")
         outbox = JSONArray(outbox.objs().filter { it.getString("cid") != cid })
         saveOutbox()
@@ -264,14 +273,14 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
                 val hit = q.isEmpty() || c.getString("name").lowercase().contains(q) ||
                     msgs.any { it.optString("text").lowercase().contains(q) }
                 if (!hit) return@mapNotNull null
-                val lastText = last?.let {
-                    (if (it.optBoolean("mine")) "Kamu: " else "") +
-                        (it.optJSONObject("file")?.let { f -> "Lampiran: " + f.getString("name") } ?: it.optString("text"))
+                val lastInfo = last?.let {
+                    JSONObject().put("mine", it.optBoolean("mine")).put("text", it.optString("text"))
+                        .put("file", it.optJSONObject("file")?.getString("name") ?: JSONObject.NULL)
                 }
                 JSONObject()
                     .put("id", c.getString("id")).put("name", c.getString("name")).put("color", c.optInt("color"))
                     .put("status", c.optString("status")).put("unread", c.optInt("unread")).put("online", c.opt("online"))
-                    .put("last", lastText ?: JSONObject.NULL)
+                    .put("last", lastInfo ?: JSONObject.NULL)
                     .put("ts", last?.optLong("ts") ?: c.optLong("createdAt"))
                     .put("queued", msgs.any { it.optBoolean("mine") && it.optString("status") in setOf("queued", "local") })
             }
@@ -280,7 +289,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
     }
 
     fun chat(cid: String): JSONObject {
-        val c = synchronized(this) { contact(cid) } ?: throw UserError("Obrolan tidak ada")
+        val c = synchronized(this) { contact(cid) } ?: throw UserError("noChat")
         // Cek apakah teman sedang online, paling sering tiap 30 detik.
         if (c.optString("status") == "ok" && System.currentTimeMillis() - c.optLong("lastCheck") > 30000) {
             c.put("lastCheck", System.currentTimeMillis())
@@ -345,14 +354,14 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
 
     private fun requireOk(cid: String): JSONObject {
         val c = synchronized(this) { contact(cid) }
-        if (c == null || c.optString("status") != "ok") throw UserError("Kontak belum disetujui")
+        if (c == null || c.optString("status") != "ok") throw UserError("notApproved")
         return c
     }
 
     fun send(cid: String, text: String?): JSONObject {
         requireOk(cid)
         val body = (text ?: "").trim().take(8000)
-        if (body.isEmpty()) throw UserError("Pesan kosong")
+        if (body.isEmpty()) throw UserError("emptyMessage")
         val msg = JSONObject().put("id", Crypto.randomId()).put("mine", true).put("text", body)
             .put("ts", System.currentTimeMillis()).put("status", "local")
         addMessage(cid, msg)
@@ -436,7 +445,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
                 backoff.remove(cid)
                 if (msgId != null) {
                     updateMessage(cid, msgId) { if (it.optString("status") != "read") it.put("status", "sent") }
-                    if (wasQueued) notify(c.getString("name"), "Pesan dari antrean sudah terkirim")
+                    if (wasQueued) notify(c.getString("name"), m("notifyQueueSent"))
                 }
             }
         } finally {
@@ -471,7 +480,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
         if (c == null) {
             // Orang yang belum ada di kontak: jadi permintaan yang harus disetujui.
             c = upsertContact(theirName, theirAddress, from, "pending")
-            notify("Permintaan kontak", "${c.getString("name")} ingin mengobrol")
+            notify(m("notifyRequestTitle"), m("notifyRequestBody", mapOf("name" to c.getString("name"))))
         } else if (theirName.isNotEmpty() && theirName != c.getString("name")) {
             synchronized(this) { c.put("name", theirName) }
         }
@@ -498,7 +507,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
                         .put("mime", p.optString("mime")).put("size", size).put("state", if (auto) "downloading" else "offered")
                     addMessage(cid, JSONObject().put("id", fid).put("mine", false).put("text", "").put("file", file).put("ts", p.optLong("ts", now)))
                     synchronized(this) { c.put("unread", c.optInt("unread") + 1) }
-                    notify(c.getString("name"), "Lampiran: ${file.getString("name")}")
+                    notify(c.getString("name"), m("notifyAttachment", mapOf("name" to file.getString("name"))))
                     if (auto) {
                         fileRequests.add(fid)
                         synchronized(this) {
@@ -555,8 +564,9 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
 
     fun patchSettings(patch: JSONObject) {
         synchronized(this) {
-            for (k in listOf("autoDelete", "readReceipts", "battery", "limit", "bridge")) if (patch.has(k)) settings.put(k, patch.get(k))
+            for (k in listOf("autoDelete", "readReceipts", "battery", "limit", "bridge", "lang")) if (patch.has(k)) settings.put(k, patch.get(k))
             if (settings.optString("limit") !in setOf("5", "25", "100", "none")) settings.put("limit", "25")
+            if (settings.optString("lang") !in setOf("id", "en")) settings.put("lang", JSONObject.NULL)
             saveSettings()
         }
         if (patch.has("bridge")) net.applyBridge(settings.getJSONObject("bridge"))
@@ -582,7 +592,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
 
     @Synchronized
     fun exportBackup(password: String?): ByteArray {
-        if (password == null || password.length < 8) throw UserError("Kata sandi minimal 8 karakter")
+        if (password == null || password.length < 8) throw UserError("shortPassword")
         val hs = JSONObject()
         File(dataDir, "tor/hs").listFiles()?.filter { it.isFile }?.forEach { hs.put(it.name, Base64.getEncoder().encodeToString(it.readBytes())) }
         val chats = JSONObject()
@@ -600,7 +610,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
 
     fun restore(buf: ByteArray, password: String?) {
         val data = JSONObject(String(Crypto.decryptBackup(buf, password ?: ""), Charsets.UTF_8))
-        if (data.optInt("v") != 1 || data.optJSONObject("identity") == null) throw UserError("Isi cadangan tidak valid")
+        if (data.optInt("v") != 1 || data.optJSONObject("identity") == null) throw UserError("badBackup")
         net.forgetOnion()
         synchronized(this) {
             store.wipe()
@@ -626,7 +636,10 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
     fun wipe() {
         net.forgetOnion()
         synchronized(this) {
+            val keepLang = lang()
             store.wipe()
+            // Bahasa tetap dipakai di layar Mulai setelah semua data dihapus.
+            if (keepLang != null) store.write("settings.json", JSONObject().put("lang", keepLang))
             load()
             locked = false
         }

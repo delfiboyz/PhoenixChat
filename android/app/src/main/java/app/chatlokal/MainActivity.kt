@@ -51,8 +51,8 @@ class MainActivity : ComponentActivity() {
         pendingSave = null
         if (uri != null && bytes != null) {
             runCatching { contentResolver.openOutputStream(uri)!!.use { it.write(bytes) } }
-                .onSuccess { toast("File disimpan") }
-                .onFailure { toast("Gagal menyimpan file") }
+                .onSuccess { toast(m("fileSaved")) }
+                .onFailure { toast(m("fileSaveFailed")) }
         }
     }
 
@@ -148,6 +148,8 @@ class MainActivity : ComponentActivity() {
         web.post { web.evaluateJavascript(js, null) }
     }
 
+    private fun m(key: String) = (application as ChatLokalApp).core.m(key)
+
     private fun toast(msg: String) = runOnUiThread { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show() }
 
     inner class Bridge {
@@ -160,20 +162,20 @@ class MainActivity : ComponentActivity() {
         @JavascriptInterface
         fun copyText(text: String) {
             val cm = getSystemService(ClipboardManager::class.java)
-            cm.setPrimaryClip(ClipData.newPlainText("Kode Chat Lokal", text))
+            cm.setPrimaryClip(ClipData.newPlainText(m("clipLabel"), text))
         }
 
         @JavascriptInterface
         fun share(text: String) {
             val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
-            runOnUiThread { startActivity(Intent.createChooser(send, "Bagikan kode Chat Lokal")) }
+            runOnUiThread { startActivity(Intent.createChooser(send, m("shareTitle"))) }
         }
 
         @JavascriptInterface
         fun scanQr() {
             val opts = ScanOptions()
                 .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-                .setPrompt("Arahkan kamera ke kode QR temanmu")
+                .setPrompt(m("scanPrompt"))
                 .setBeepEnabled(false)
                 .setOrientationLocked(false)
             runOnUiThread { scan.launch(opts) }

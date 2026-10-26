@@ -34,7 +34,7 @@ private fun status(code: Int, text: String) = object : NanoHTTPD.Response.IStatu
 
 private fun readBody(session: NanoHTTPD.IHTTPSession, max: Long): ByteArray {
     val len = session.headers["content-length"]?.toLongOrNull() ?: 0L
-    if (len > max) throw UserError("Terlalu besar")
+    if (len > max) throw UserError("tooLarge")
     val out = ByteArray(len.toInt())
     var off = 0
     val input = session.inputStream
@@ -161,7 +161,7 @@ class UiServer(port: Int, private val core: Core, private val token: String, pri
         if (!path.startsWith("/api/")) return serveStatic(path)
 
         val given = session.headers["x-token"] ?: session.parameters["token"]?.firstOrNull()
-        if (given != token) return err(401, "Unauthorized", "Token tidak valid")
+        if (given != token) return err(401, "Unauthorized", core.m("badToken"))
 
         return try {
             if (session.method == Method.GET && path == "/api/events") {
@@ -169,11 +169,11 @@ class UiServer(port: Int, private val core: Core, private val token: String, pri
                 clients.add(stream)
                 return newChunkedResponse(Response.Status.OK, "text/event-stream", stream).apply { addHeader("Cache-Control", "no-store") }
             }
-            if (core.locked && path != "/api/status" && path != "/api/unlock") return err(423, "Locked", "Aplikasi terkunci")
+            if (core.locked && path != "/api/status" && path != "/api/unlock") return err(423, "Locked", core.m("locked"))
             if (session.method == Method.GET && path == "/api/qr") return qr()
             Regex("^/api/files/([\\w-]+)$").find(path)?.let { m ->
                 if (session.method != Method.GET) return@let
-                val bytes = core.getFile(m.groupValues[1]) ?: return err(404, "Not Found", "Lampiran belum ada")
+                val bytes = core.getFile(m.groupValues[1]) ?: return err(404, "Not Found", core.m("noAttachment"))
                 val type = session.parameters["type"]?.firstOrNull() ?: "application/octet-stream"
                 return newFixedLengthResponse(Response.Status.OK, type, ByteArrayInputStream(bytes), bytes.size.toLong()).apply {
                     addHeader("Cache-Control", "no-store")
@@ -191,19 +191,17 @@ class UiServer(port: Int, private val core: Core, private val token: String, pri
                 val params = r.keys.mapIndexed { i, k -> k to URLDecoder.decode(m.groupValues[i + 1], "UTF-8") }.toMap()
                 return jsonResponse(Response.Status.OK, r.handler(session, params) ?: JSONObject())
             }
-            err(404, "Not Found", "Tidak ditemukan")
+            err(404, "Not Found", core.m("notFound"))
         } catch (e: UserError) {
-            err(400, "Bad Request", e.message ?: "Gagal")
-        } catch (e: IllegalArgumentException) {
-            err(400, "Bad Request", e.message ?: "Gagal")
+            err(if (e.key == "tooLarge") 413 else 400, "Bad Request", core.m(e.key, e.vars))
         } catch (e: Exception) {
-            err(400, "Bad Request", e.message ?: "Gagal")
+            err(400, "Bad Request", e.message ?: core.m("failed"))
         }
     }
 
     private fun qr(): Response {
         val code = core.status().optJSONObject("me")?.optString("code")?.takeIf { it.isNotEmpty() && it != "null" }
-            ?: return err(404, "Not Found", "Belum ada kode")
+            ?: return err(404, "Not Found", core.m("noCode"))
         val m = QRCodeWriter().encode(code, BarcodeFormat.QR_CODE, 0, 0, mapOf(
             EncodeHintType.MARGIN to 0,
             EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.M,

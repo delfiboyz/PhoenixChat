@@ -9,6 +9,7 @@ import android.net.LocalSocketAddress
 import android.os.IBinder
 import android.util.Log
 import app.chatlokal.core.Network
+import app.chatlokal.core.UserError
 import IPtProxy.IPtProxy
 import IPtProxy.OnTransportEvents
 import okhttp3.MediaType.Companion.toMediaType
@@ -141,7 +142,7 @@ class TorNetwork(
         val type = bridge.optString("type", "none")
         if (type == "none") return emptyList()
         val lines = bridge.optString("lines").lines().map { it.trim().removePrefix("Bridge ").trim() }.filter { it.isNotEmpty() }
-        if (lines.isEmpty()) throw IllegalArgumentException("Alamat bridge belum diisi")
+        if (lines.isEmpty()) throw UserError("bridgeNoLines")
         return listOf("UseBridges 1", transportLine(type)) + lines.map { "Bridge $it" }
     }
 
@@ -190,7 +191,7 @@ class TorNetwork(
         } else if (phase == "error") {
             // tetap error sampai pengguna mencoba lagi
         } else if (System.currentTimeMillis() - startedAt > 120_000) {
-            set("error", p, "Tidak bisa terhubung ke jaringan Tor. Periksa koneksi internet atau aktifkan bridge.")
+            set("error", p, "torTimeout") // diterjemahkan oleh Core
         } else {
             set("connecting", p)
         }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '../api.js';
 import { Icon } from '../ui.jsx';
+import { t } from '../i18n.js';
 
 export default function Lock({ onUnlock }) {
   const [pin, setPin] = useState('');
@@ -17,12 +18,12 @@ export default function Lock({ onUnlock }) {
   return (
     <form className="lock" onSubmit={submit}>
       <div className="brand-mark" style={{ width: 56, height: 56, borderRadius: 16 }}><Icon.lock size={26} /></div>
-      <h1 className="h-display" style={{ fontSize: 28 }}>Chat Lokal terkunci</h1>
-      <label htmlFor="pin" className="hint">Masukkan PIN</label>
+      <h1 className="h-display" style={{ fontSize: 28 }}>{t('lock.title')}</h1>
+      <label htmlFor="pin" className="hint">{t('lock.enter')}</label>
       <input id="pin" className="input" type="password" inputMode="numeric" autoFocus maxLength={8}
         value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} />
       {error && <span className="error" role="alert">{error}</span>}
-      <button type="submit" className="btn btn-primary btn-lg" style={{ width: 240 }} disabled={pin.length < 4}>Buka</button>
+      <button type="submit" className="btn btn-primary btn-lg" style={{ width: 240 }} disabled={pin.length < 4}>{t('lock.open')}</button>
     </form>
   );
 }

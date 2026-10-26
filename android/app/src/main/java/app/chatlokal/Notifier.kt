@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import app.chatlokal.core.I18n
 
 object Notifier {
     const val CHANNEL_MESSAGES = "messages"
@@ -18,13 +19,14 @@ object Notifier {
     const val SERVICE_ID = 1
     private var nextId = 100
 
-    fun createChannels(ctx: Context) {
+    // Dipanggil ulang saat bahasa berubah: membuat kanal dengan id yang sama hanya memperbarui namanya.
+    fun createChannels(ctx: Context, lang: String?) {
         val nm = ctx.getSystemService(NotificationManager::class.java)
-        nm.createNotificationChannel(NotificationChannel(CHANNEL_MESSAGES, "Pesan", NotificationManager.IMPORTANCE_HIGH).apply {
-            description = "Pesan baru dan permintaan kontak"
+        nm.createNotificationChannel(NotificationChannel(CHANNEL_MESSAGES, I18n.msg(lang, "channelMessages"), NotificationManager.IMPORTANCE_HIGH).apply {
+            description = I18n.msg(lang, "channelMessagesDesc")
         })
-        nm.createNotificationChannel(NotificationChannel(CHANNEL_SERVICE, "Koneksi Tor", NotificationManager.IMPORTANCE_LOW).apply {
-            description = "Menjaga Chat Lokal menerima pesan di latar belakang"
+        nm.createNotificationChannel(NotificationChannel(CHANNEL_SERVICE, I18n.msg(lang, "channelService"), NotificationManager.IMPORTANCE_LOW).apply {
+            description = I18n.msg(lang, "channelServiceDesc")
             setShowBadge(false)
         })
     }
@@ -34,24 +36,24 @@ object Notifier {
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
     )
 
-    fun service(ctx: Context): Notification = NotificationCompat.Builder(ctx, CHANNEL_SERVICE)
+    fun service(ctx: Context, lang: String?): Notification = NotificationCompat.Builder(ctx, CHANNEL_SERVICE)
         .setSmallIcon(R.drawable.ic_stat)
-        .setContentTitle("Chat Lokal aktif")
-        .setContentText("Menerima pesan lewat Tor. Pesan tetap hanya di perangkat ini.")
+        .setContentTitle(I18n.msg(lang, "serviceTitle"))
+        .setContentText(I18n.msg(lang, "serviceText"))
         .setOngoing(true)
         .setContentIntent(openApp(ctx))
         .setPriority(NotificationCompat.PRIORITY_LOW)
         .build()
 
     // Isi pesan ikut ditampilkan; layar kunci hanya melihat versi tanpa isi.
-    fun message(ctx: Context, title: String, body: String) {
+    fun message(ctx: Context, title: String, body: String, lang: String?) {
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED &&
             android.os.Build.VERSION.SDK_INT >= 33
         ) return
         val public = NotificationCompat.Builder(ctx, CHANNEL_MESSAGES)
             .setSmallIcon(R.drawable.ic_stat)
             .setContentTitle("Chat Lokal")
-            .setContentText("Pesan baru")
+            .setContentText(I18n.msg(lang, "newMessage"))
             .build()
         val n = NotificationCompat.Builder(ctx, CHANNEL_MESSAGES)
             .setSmallIcon(R.drawable.ic_stat)

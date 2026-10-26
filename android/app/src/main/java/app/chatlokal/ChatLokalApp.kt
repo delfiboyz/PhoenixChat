@@ -24,7 +24,6 @@ class ChatLokalApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Notifier.createChannels(this)
 
         val dataDir = File(filesDir, "data")
         // Port peer tetap per perangkat, karena layanan onion memetakan ke port ini.
@@ -33,6 +32,7 @@ class ChatLokalApp : Application() {
         val tor = TorNetwork(this, dataDir, peerPort) { c.networkChanged() }
         c = Core(dataDir, peerPort, tor)
         core = c
+        Notifier.createChannels(this, core.lang())
 
         PeerServer(peerPort, core).start(LocalServers.TIMEOUT, true)
         val token = Base64.getUrlEncoder().withoutPadding().encodeToString(Crypto.randomBytes(24))
@@ -41,8 +41,11 @@ class ChatLokalApp : Application() {
 
         core.onEvent { type, data ->
             when (type) {
-                "notify" -> if (!MainActivity.visible) Notifier.message(this, data.optString("title"), data.optString("body"))
-                "change" -> if (data.optString("kind") in setOf("me", "settings")) syncService()
+                "notify" -> if (!MainActivity.visible) Notifier.message(this, data.optString("title"), data.optString("body"), core.lang())
+                "change" -> if (data.optString("kind") in setOf("me", "settings")) {
+                    Notifier.createChannels(this, core.lang())
+                    syncService()
+                }
             }
         }
         if (core.identity != null) core.startNetwork()

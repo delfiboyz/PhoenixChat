@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api, hasToken, subscribe } from './api.js';
 import { Icon } from './ui.jsx';
+import { detectLang, getLang, setLang, t } from './i18n.js';
 import Start from './screens/Start.jsx';
 import Lock from './screens/Lock.jsx';
 import ChatList from './screens/ChatList.jsx';
@@ -14,8 +15,24 @@ export default function App() {
   const [view, setView] = useState(null); // null | {name:'chat',id} | {name:'add'} | {name:'settings'}
   const [rev, setRev] = useState(0);
   const [toast, setToast] = useState(null);
+  const [lang, setLangState] = useState(getLang());
 
   const refresh = useCallback(() => api.status().then(setStatus, (e) => setError(e.message)), []);
+
+  // Bahasa tersimpan di perangkat; jika belum pernah dipilih, tebak dari sistem dan simpan.
+  const changeLang = useCallback((next) => {
+    setLang(next);
+    setLangState(next);
+    api.patchSettings({ lang: next }).catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (!status) return;
+    if (status.lang) {
+      if (status.lang !== getLang()) { setLang(status.lang); setLangState(status.lang); }
+    } else if (!status.locked) {
+      changeLang(detectLang());
+    }
+  }, [status, changeLang]);
 
   useEffect(() => {
     if (!hasToken()) return undefined;
@@ -53,16 +70,16 @@ export default function App() {
   }, [toast]);
 
   if (!hasToken()) {
-    return <div className="placeholder-main"><p>Buka Chat Lokal lewat aplikasinya. Alamat ini butuh token akses dari aplikasi.</p></div>;
+    return <div className="placeholder-main"><p>{t('app.noToken')}</p></div>;
   }
   if (error && !status) return <div className="placeholder-main"><p>{error}</p></div>;
-  if (!status) return <div className="placeholder-main"><p>Memuat…</p></div>;
+  if (!status) return <div className="placeholder-main"><p>{t('common.loading')}</p></div>;
   if (status.locked) return <Lock onUnlock={setStatus} />;
   if (!status.onboarded) {
-    return <Start onDone={(s) => { setStatus(s); setView(null); if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); }} />;
+    return <Start lang={lang} onLang={changeLang} onDone={(s) => { setStatus(s); setView(null); if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); }} />;
   }
 
-  const ctx = { status, rev, go: setView, toast: setToast, refresh };
+  const ctx = { status, rev, go: setView, toast: setToast, refresh, lang, onLang: changeLang };
   let main;
   if (view?.name === 'chat') main = <ChatRoom key={view.id} id={view.id} {...ctx} />;
   else if (view?.name === 'add') main = <AddContact key={view.code || 'add'} initialCode={view.code} {...ctx} />;
@@ -71,7 +88,7 @@ export default function App() {
     main = (
       <div className="placeholder-main">
         <div className="empty-art"><Icon.chat size={40} /></div>
-        <p>Pilih obrolan, atau tambahkan kontak dengan bertukar kode.</p>
+        <p>{t('app.pick')}</p>
       </div>
     );
   }

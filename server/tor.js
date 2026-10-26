@@ -4,6 +4,7 @@ import { spawn, execFileSync } from 'node:child_process';
 import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import path from 'node:path';
+import { UserError } from './i18n.js';
 
 function which(bin) {
   try {
@@ -42,8 +43,8 @@ export class Tor extends EventEmitter {
     if (bridge && bridge.type !== 'none') {
       const lines2 = (bridge.lines || '').split('\n').map((l) => l.trim()).filter(Boolean);
       const exe = bridge.type === 'snowflake' ? which('snowflake-client') : (which('lyrebird') || which('obfs4proxy'));
-      if (!exe) throw new Error(`Program bridge ${bridge.type} tidak ditemukan di sistem`);
-      if (!lines2.length) throw new Error('Alamat bridge belum diisi');
+      if (!exe) throw new UserError('bridgeProgram', { type: bridge.type });
+      if (!lines2.length) throw new UserError('bridgeNoLines');
       lines.push('UseBridges 1', `ClientTransportPlugin ${bridge.type} exec ${exe}`);
       for (const l of lines2) lines.push(`Bridge ${l.replace(/^Bridge\s+/i, '')}`);
     }
@@ -53,7 +54,7 @@ export class Tor extends EventEmitter {
   start(bridge) {
     this.stop();
     if (!this.torPath) {
-      this.set({ phase: 'error', error: 'Program tor tidak ditemukan. Pasang paket tor terlebih dahulu.' });
+      this.set({ phase: 'error', error: { key: 'torMissing' } });
       return;
     }
     fs.mkdirSync(path.join(this.dir, 'hs'), { recursive: true, mode: 0o700 });
@@ -62,7 +63,7 @@ export class Tor extends EventEmitter {
     try {
       rc = this.torrc(bridge);
     } catch (e) {
-      this.set({ phase: 'error', error: e.message });
+      this.set({ phase: 'error', error: e.key ? { key: e.key, vars: e.vars } : e.message });
       return;
     }
     fs.writeFileSync(path.join(this.dir, 'torrc'), rc);
@@ -84,14 +85,14 @@ export class Tor extends EventEmitter {
       if (this.proc !== proc) return;
       this.proc = null;
       if (this.state.phase !== 'stopped') {
-        this.set({ phase: 'error', error: `Tor berhenti (kode ${code}). Periksa koneksi internet atau aktifkan bridge.` });
+        this.set({ phase: 'error', error: { key: 'torStopped', vars: { code } } });
       }
     });
     // Bootstrap yang macet terlalu lama dianggap gagal.
     clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       if (this.state.phase === 'connecting') {
-        this.set({ phase: 'error', error: 'Tidak bisa terhubung ke jaringan Tor. Periksa koneksi internet atau aktifkan bridge.' });
+        this.set({ phase: 'error', error: { key: 'torTimeout' } });
       }
     }, 120000);
   }

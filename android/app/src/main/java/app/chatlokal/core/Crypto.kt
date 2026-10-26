@@ -121,7 +121,7 @@ object Crypto {
     }
 
     fun decryptBackup(buf: ByteArray, password: String): ByteArray {
-        if (buf.size < 48 || String(buf.copyOfRange(0, 4)) != "CLB1") throw IllegalArgumentException("Bukan file cadangan Chat Lokal")
+        if (buf.size < 48 || String(buf.copyOfRange(0, 4)) != "CLB1") throw UserError("notBackup")
         val salt = buf.copyOfRange(4, 20)
         val iv = buf.copyOfRange(20, 32)
         val tag = buf.copyOfRange(32, 48)
@@ -132,7 +132,7 @@ object Crypto {
         return try {
             c.doFinal(body + tag)
         } catch (e: Exception) {
-            throw IllegalArgumentException("Kata sandi salah atau file rusak")
+            throw UserError("wrongPassword")
         }
     }
 

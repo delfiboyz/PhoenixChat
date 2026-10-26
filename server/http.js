@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import QRCode from 'qrcode';
 import { limitBytes } from './core.js';
+import { UserError } from './i18n.js';
 
 const MB = 1024 * 1024;
 
@@ -16,7 +17,7 @@ function readBody(req, max) {
     req.on('data', (c) => {
       size += c.length;
       if (size > max) {
-        reject(Object.assign(new Error('Terlalu besar'), { code: 413 }));
+        reject(Object.assign(new UserError('tooLarge'), { code: 413 }));
         req.destroy();
         return;
       }
@@ -122,7 +123,7 @@ export function createUiServer(core, { token, distDir, allowedHosts }) {
     }
     const given = req.headers['x-token'] || url.searchParams.get('token');
     if (given !== token) {
-      json(res, 401, { error: 'Token tidak valid' });
+      json(res, 401, { error: core.m('badToken') });
       return;
     }
 
@@ -136,12 +137,12 @@ export function createUiServer(core, { token, distDir, allowedHosts }) {
         return;
       }
       if (core.locked && !(url.pathname === '/api/status' || url.pathname === '/api/unlock')) {
-        json(res, 423, { error: 'Aplikasi terkunci' });
+        json(res, 423, { error: core.m('locked') });
         return;
       }
       if (req.method === 'GET' && url.pathname === '/api/qr') {
         const code = core.status().me?.code;
-        if (!code) { json(res, 404, { error: 'Belum ada kode' }); return; }
+        if (!code) { json(res, 404, { error: core.m('noCode') }); return; }
         const svg = await QRCode.toString(code, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#15201B', light: '#FFFFFF' } });
         res.writeHead(200, { 'content-type': 'image/svg+xml', 'cache-control': 'no-store' });
         res.end(svg);
@@ -150,7 +151,7 @@ export function createUiServer(core, { token, distDir, allowedHosts }) {
       const fm = url.pathname.match(/^\/api\/files\/([\w-]+)$/);
       if (req.method === 'GET' && fm) {
         const buf = core.getFile(fm[1]);
-        if (!buf) { json(res, 404, { error: 'Lampiran belum ada' }); return; }
+        if (!buf) { json(res, 404, { error: core.m('noAttachment') }); return; }
         res.writeHead(200, { 'content-type': url.searchParams.get('type') || 'application/octet-stream', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'content-security-policy': "default-src 'none'; img-src 'self'; media-src 'self'; style-src 'unsafe-inline'" });
         res.end(buf);
         return;
@@ -170,9 +171,9 @@ export function createUiServer(core, { token, distDir, allowedHosts }) {
         json(res, 200, out ?? {});
         return;
       }
-      json(res, 404, { error: 'Tidak ditemukan' });
+      json(res, 404, { error: core.m('notFound') });
     } catch (e) {
-      json(res, e.code === 413 ? 413 : 400, { error: e.message || 'Gagal' });
+      json(res, e.code === 413 ? 413 : 400, { error: e.key ? core.m(e.key, e.vars) : (e.message || core.m('failed')) });
     }
   });
 }

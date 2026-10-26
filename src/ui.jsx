@@ -1,5 +1,6 @@
 // Ikon garis dan komponen kecil yang dipakai di banyak layar.
 import { useEffect, useRef } from 'react';
+import { getLang, locale, t } from './i18n.js';
 
 const Svg = ({ size = 22, sw = 2, children, ...rest }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={sw}
@@ -28,6 +29,7 @@ export const Icon = {
   devices: (p) => <Svg {...p}><rect x="2" y="6" width="8" height="13" rx="1.5" /><rect x="14" y="4" width="8" height="15" rx="1.5" /><path d="M10 12h4" /></Svg>,
   file: (p) => <Svg {...p}><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /></Svg>,
   chat: (p) => <Svg {...p}><path d="M4 5h16v11H9l-5 4z" /></Svg>,
+  globe: (p) => <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z" /></Svg>,
 };
 
 export const AVATAR_COLORS = [
@@ -67,9 +69,9 @@ export function Modal({ title, children, onClose }) {
   );
 }
 
-const nf = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 1 });
 export function formatBytes(n) {
   if (n == null) return '';
+  const nf = new Intl.NumberFormat(locale(), { maximumFractionDigits: 1 });
   if (n < 1024) return `${n} B`;
   if (n < 1024 * 1024) return `${nf.format(n / 1024)} KB`;
   if (n < 1024 * 1024 * 1024) return `${nf.format(n / 1024 / 1024)} MB`;
@@ -78,27 +80,29 @@ export function formatBytes(n) {
 
 const pad = (n) => String(n).padStart(2, '0');
 const sameDay = (a, b) => a.toDateString() === b.toDateString();
-const DAYS = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-
-export const clock = (ts) => { const d = new Date(ts); return `${pad(d.getHours())}.${pad(d.getMinutes())}`; };
+// Jam: 13.48 dalam bahasa Indonesia, 13:48 dalam bahasa Inggris.
+export const clock = (ts) => {
+  const d = new Date(ts);
+  return `${pad(d.getHours())}${getLang() === 'en' ? ':' : '.'}${pad(d.getMinutes())}`;
+};
 
 export function listTime(ts) {
   const d = new Date(ts);
   const now = new Date();
   if (sameDay(d, now)) return clock(ts);
   const y = new Date(now); y.setDate(now.getDate() - 1);
-  if (sameDay(d, y)) return 'Kemarin';
-  if (now - d < 6 * 864e5) return DAYS[d.getDay()];
+  if (sameDay(d, y)) return t('day.yesterday');
+  if (now - d < 6 * 864e5) return d.toLocaleDateString(locale(), { weekday: 'short' });
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
 }
 
 export function dayLabel(ts) {
   const d = new Date(ts);
   const now = new Date();
-  if (sameDay(d, now)) return 'Hari ini';
+  if (sameDay(d, now)) return t('day.today');
   const y = new Date(now); y.setDate(now.getDate() - 1);
-  if (sameDay(d, y)) return 'Kemarin';
-  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: d.getFullYear() === now.getFullYear() ? undefined : 'numeric' });
+  if (sameDay(d, y)) return t('day.yesterday');
+  return d.toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: d.getFullYear() === now.getFullYear() ? undefined : 'numeric' });
 }
 
 // Jembatan ke aplikasi Android (null di desktop/browser).
@@ -122,7 +126,7 @@ export function saveBlob(blob, name) {
 
 export async function downloadFile(url, name) {
   const res = await fetch(url);
-  if (!res.ok) throw new Error('Lampiran tidak bisa dibaca');
+  if (!res.ok) throw new Error(t('err.attachRead'));
   saveBlob(await res.blob(), name);
 }
 

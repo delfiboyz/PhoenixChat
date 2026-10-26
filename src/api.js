@@ -1,4 +1,6 @@
 // Klien API lokal. Token diberikan lewat #token=… saat aplikasi dibuka.
+import { t } from './i18n.js';
+
 const fromHash = new URLSearchParams(location.hash.slice(1)).get('token');
 if (fromHash) {
   try { sessionStorage.setItem('token', fromHash); } catch {}
@@ -20,10 +22,10 @@ async function call(method, path, body, headers = {}) {
   });
   if (res.headers.get('content-type')?.includes('application/json')) {
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Gagal');
+    if (!res.ok) throw new Error(data.error || t('err.failed'));
     return data;
   }
-  if (!res.ok) throw new Error('Gagal');
+  if (!res.ok) throw new Error(t('err.failed'));
   return res.blob();
 }
 
