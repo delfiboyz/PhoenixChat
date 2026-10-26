@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg">#F3F4EF</color>
-    <color name="accent">#1E6B51</color>
-    <style name="Theme.ChatLokal" parent="android:Theme.Material.Light.NoActionBar">
+    <color name="bg">#121014</color>
+    <color name="accent">#FF7A33</color>
+    <style name="Theme.ChatLokal" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/bg</item>
         <item name="android:colorAccent">@color/accent</item>
         <item name="android:colorPrimary">@color/accent</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 </resources>

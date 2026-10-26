@@ -20,7 +20,7 @@ const id = {
   'lang.pick': 'Bahasa · Language',
   'lang.title': 'Bahasa',
 
-  'app.noToken': 'Buka Chat Lokal lewat aplikasinya. Alamat ini butuh token akses dari aplikasi.',
+  'app.noToken': 'Buka Phoenix Chat lewat aplikasinya. Alamat ini butuh token akses dari aplikasi.',
   'app.pick': 'Pilih obrolan, atau tambahkan kontak dengan bertukar kode.',
 
   'day.today': 'Hari ini',
@@ -49,7 +49,7 @@ const id = {
   'restore.busy': 'Memulihkan…',
   'restore.go': 'Pulihkan',
 
-  'lock.title': 'Chat Lokal terkunci',
+  'lock.title': 'Phoenix Chat terkunci',
   'lock.enter': 'Masukkan PIN',
   'lock.open': 'Buka',
 
@@ -121,7 +121,7 @@ const id = {
   'add.copied': 'Kode disalin',
   'add.copyFail': 'Tidak bisa menyalin ke papan klip',
   'add.share': 'Bagikan tautan',
-  'add.shareTitle': 'Kode Chat Lokal',
+  'add.shareTitle': 'Kode Phoenix Chat',
   'add.linkCopied': 'Tautan disalin. Kirim lewat aplikasi lain.',
   'add.scanBtn': 'Pindai kode QR teman',
   'add.codeLabel': 'Kode atau tautan teman',
@@ -225,7 +225,7 @@ const en = {
   'lang.pick': 'Bahasa · Language',
   'lang.title': 'Language',
 
-  'app.noToken': 'Open Chat Lokal from the app. This address needs an access token from the app.',
+  'app.noToken': 'Open Phoenix Chat from the app. This address needs an access token from the app.',
   'app.pick': 'Pick a chat, or add a contact by exchanging codes.',
 
   'day.today': 'Today',
@@ -254,7 +254,7 @@ const en = {
   'restore.busy': 'Restoring…',
   'restore.go': 'Restore',
 
-  'lock.title': 'Chat Lokal is locked',
+  'lock.title': 'Phoenix Chat is locked',
   'lock.enter': 'Enter your PIN',
   'lock.open': 'Unlock',
 
@@ -326,7 +326,7 @@ const en = {
   'add.copied': 'Code copied',
   'add.copyFail': "Couldn't copy to the clipboard",
   'add.share': 'Share link',
-  'add.shareTitle': 'Chat Lokal code',
+  'add.shareTitle': 'Phoenix Chat code',
   'add.linkCopied': 'Link copied. Send it through another app.',
   'add.scanBtn': "Scan a friend's QR code",
   'add.codeLabel': "Friend's code or link",

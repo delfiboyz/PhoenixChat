@@ -29,7 +29,7 @@ function ExportModal({ onClose, toast, intro }) {
     try {
       const blob = await api.exportBackup(pw);
       const d = new Date();
-      saveBlob(blob, `chat-lokal-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.clbak`);
+      saveBlob(blob, `phoenix-chat-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.clbak`);
       toast(t('exp.done'));
       onClose();
     } catch (err) {
@@ -177,14 +177,14 @@ export default function Settings({ status, rev, go, toast, refresh, lang, onLang
             <span className="mono" style={{ fontSize: 13, color: 'var(--body-2)' }}>{t('set.used', { size: formatBytes(u.total) })}</span>
           </div>
           <div className="meter" role="img" aria-label={t('set.meter', { m: formatBytes(u.messages), f: formatBytes(u.files), k: formatBytes(u.keys) })}>
-            <div style={{ width: pct(u.messages), background: '#1E6B51' }} />
-            <div style={{ width: pct(u.files), background: '#6FB396' }} />
-            <div style={{ width: pct(u.keys), background: '#B9D6C8' }} />
+            <div style={{ width: pct(u.messages), background: 'var(--meter-1)' }} />
+            <div style={{ width: pct(u.files), background: 'var(--meter-2)' }} />
+            <div style={{ width: pct(u.keys), background: 'var(--meter-3)' }} />
           </div>
           <div className="legend">
-            <span><i style={{ background: '#1E6B51' }} />{t('set.messages')} {formatBytes(u.messages)}</span>
-            <span><i style={{ background: '#6FB396' }} />{t('set.files')} {formatBytes(u.files)}</span>
-            <span><i style={{ background: '#B9D6C8' }} />{t('set.keys')} {formatBytes(u.keys)}</span>
+            <span><i style={{ background: 'var(--meter-1)' }} />{t('set.messages')} {formatBytes(u.messages)}</span>
+            <span><i style={{ background: 'var(--meter-2)' }} />{t('set.files')} {formatBytes(u.files)}</span>
+            <span><i style={{ background: 'var(--meter-3)' }} />{t('set.keys')} {formatBytes(u.keys)}</span>
           </div>
           {lowSpace && <div className="warn-box">{t('set.lowSpace', { free: formatBytes(u.free) })}</div>}
           <div className="divider" />

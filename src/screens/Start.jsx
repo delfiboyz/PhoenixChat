@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { api } from '../api.js';
 import { LANGS, t } from '../i18n.js';
-import { Icon, Modal } from '../ui.jsx';
+import { Icon, Modal, PhoenixLogo } from '../ui.jsx';
 
 // Pemilih bahasa: dipakai di layar Mulai dan di Pengaturan.
 export function LangPicker({ lang, onLang, label }) {
@@ -40,8 +40,8 @@ export default function Start({ onDone, lang, onLang }) {
     <div className="screen">
       <form className="start narrow" onSubmit={start}>
         <div className="brand">
-          <div className="brand-mark"><Icon.logo /></div>
-          <span className="brand-name">Chat Lokal</span>
+          <div className="brand-mark"><PhoenixLogo size={30} /></div>
+          <span className="brand-name">Phoenix Chat</span>
         </div>
 
         <LangPicker lang={lang} onLang={onLang} label={t('lang.pick')} />

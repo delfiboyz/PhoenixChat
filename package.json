@@ -1,5 +1,6 @@
 {
-  "name": "chat-lokal",
+  "name": "phoenix-chat",
+  "productName": "Phoenix Chat",
   "version": "0.1.0",
   "description": "Chat tanpa akun dan tanpa database: data di perangkat, pesan langsung antar perangkat lewat Tor.",
   "type": "module",

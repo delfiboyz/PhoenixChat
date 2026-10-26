@@ -52,7 +52,7 @@ object Notifier {
         ) return
         val public = NotificationCompat.Builder(ctx, CHANNEL_MESSAGES)
             .setSmallIcon(R.drawable.ic_stat)
-            .setContentTitle("Chat Lokal")
+            .setContentTitle("Phoenix Chat")
             .setContentText(I18n.msg(lang, "newMessage"))
             .build()
         val n = NotificationCompat.Builder(ctx, CHANNEL_MESSAGES)

@@ -74,7 +74,7 @@ class TorNetwork(
             ctl = c
             c
         } catch (e: Exception) {
-            Log.w("ChatLokal", "Port kontrol belum siap: ${e.message}")
+            Log.w("PhoenixChat", "Port kontrol belum siap: ${e.message}")
             null
         }
     }
@@ -130,7 +130,7 @@ class TorNetwork(
     private fun transportLine(type: String): String {
         val c = pt ?: IPtProxy.newController(File(context.filesDir, "pt").apply { mkdirs() }.path, false, false, "ERROR", object : OnTransportEvents {
             override fun connected(transport: String?) {}
-            override fun error(transport: String?, e: Exception?) { Log.w("ChatLokal", "PT $transport: ${e?.message}") }
+            override fun error(transport: String?, e: Exception?) { Log.w("PhoenixChat", "PT $transport: ${e?.message}") }
             override fun stopped(transport: String?, e: Exception?) {}
         }).also { pt = it }
         val name = if (type == "snowflake") IPtProxy.Snowflake else IPtProxy.Obfs4
@@ -222,7 +222,7 @@ class TorNetwork(
             if (address() == null && serviceId != null) File(hsDir, "hostname").writeText("$serviceId.onion\n")
             onChange()
         } catch (e: Exception) {
-            Log.w("ChatLokal", "ADD_ONION gagal: ${e.message}")
+            Log.w("PhoenixChat", "ADD_ONION gagal: ${e.message}")
         }
     }
 

@@ -1,6 +1,6 @@
-# Chat Lokal
+# Phoenix Chat
 
-Aplikasi chat tanpa akun dan tanpa database. Identitas adalah kunci acak yang dibuat di perangkat, semua data tersimpan sebagai file lokal, dan pesan dikirim langsung antar perangkat lewat layanan onion Tor dengan enkripsi ujung ke ujung.
+Phoenix Chat adalah aplikasi chat tanpa akun dan tanpa database, dengan tampilan gelap dan logo phoenix. Identitas adalah kunci acak yang dibuat di perangkat, semua data tersimpan sebagai file lokal, dan pesan dikirim langsung antar perangkat lewat layanan onion Tor dengan enkripsi ujung ke ujung.
 
 Desain mengikuti canvas "Desain Aplikasi Chat Lokal" (5 layar) dan arsitektur mengikuti "Dokumen Desain — Chat Lokal". Ada dua versi dengan protokol yang sama, jadi penggunanya bisa saling mengobrol: aplikasi desktop (Electron, `server/`) dan aplikasi Android (Kotlin, `android/`). Keduanya memakai antarmuka React yang sama (`src/`).
 
@@ -16,7 +16,7 @@ npm install
 npm start
 ```
 
-`npm start` membangun antarmuka lalu membuka aplikasi desktop. Data disimpan di folder data aplikasi Electron (`~/.config/chat-lokal/data` di Linux).
+`npm start` membangun antarmuka lalu membuka aplikasi desktop. Data disimpan di folder data aplikasi Electron (`~/.config/Phoenix Chat/data` di Linux; folder lama `~/.config/chat-lokal` tetap dipakai jika sudah ada).
 
 Tanpa Electron, antarmuka bisa dibuka di browser:
 
@@ -89,6 +89,7 @@ src/                   antarmuka React: Mulai, Obrolan, Ruang obrolan, Tambah ko
 - **Lampiran**: pengirim menawarkan; penerima mengunduh otomatis jika di bawah batas yang diatur di Pengaturan, selebihnya lewat tombol *Unduh*.
 - **Cadangan**: satu file berisi kunci, kontak, pesan, dan lampiran, dienkripsi AES-256-GCM dengan kunci dari scrypt(kata sandi).
 - **Bahasa**: Indonesia dan Inggris, dipilih di layar Mulai (tebakan awal dari bahasa sistem) dan bisa diganti di Pengaturan. Pilihan disimpan sebagai pengaturan `lang` di perangkat, jadi pesan galat, status Tor, dan notifikasi ikut bahasa itu. Kamus antarmuka ada di `src/i18n.js`, pesan server di `server/i18n.js` dan `android/.../core/I18n.kt`.
+- **Nama dan pengenal teknis**: nama yang terlihat adalah *Phoenix Chat*, tetapi skema kode kontak `chatlokal:`, ID paket Android `app.chatlokal`, dan format cadangan tetap, sehingga kode kontak, cadangan, dan instalasi lama tetap berlaku.
 - **Huruf** dibundel lokal (`@fontsource`), tidak dimuat dari Google Fonts, agar tidak ada koneksi di luar Tor.
 
 ## Perbedaan dari desain

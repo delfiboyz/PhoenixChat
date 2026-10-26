@@ -32,17 +32,18 @@ export const Icon = {
   globe: (p) => <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z" /></Svg>,
 };
 
+// Avatar inisial: latar gelap berwarna dengan huruf terang, cocok untuk tema gelap.
 export const AVATAR_COLORS = [
-  { bg: '#F6D9C4', fg: '#6B3413' },
-  { bg: '#D6E4F5', fg: '#1F3F6B' },
-  { bg: '#DCEBD2', fg: '#2F5219' },
-  { bg: '#EBD9EF', fg: '#5A2766' },
-  { bg: '#F3E7B8', fg: '#5C4708' },
-  { bg: '#D3ECEA', fg: '#1C5450' },
+  { bg: '#3B2418', fg: '#FFB38A' },
+  { bg: '#1E2A3D', fg: '#9CC3F5' },
+  { bg: '#1F3324', fg: '#9ED9A8' },
+  { bg: '#33203A', fg: '#E0AEEA' },
+  { bg: '#38301A', fg: '#F0D58A' },
+  { bg: '#183230', fg: '#8FD9D2' },
 ];
 
 export function Avatar({ name, color = 0, size = 48, accent }) {
-  const c = accent ? { bg: 'var(--accent)', fg: '#FFFFFF' } : AVATAR_COLORS[color % AVATAR_COLORS.length];
+  const c = accent ? { bg: 'var(--accent)', fg: 'var(--on-accent)' } : AVATAR_COLORS[color % AVATAR_COLORS.length];
   return (
     <div className="avatar" style={{ width: size, height: size, background: c.bg, color: c.fg, fontSize: Math.round(size * 0.36) }} aria-hidden="true">
       {(name || '?').trim().charAt(0).toUpperCase()}
@@ -136,4 +137,18 @@ export async function copyText(text) {
     return;
   }
   await navigator.clipboard.writeText(text);
+}
+
+// Logo Phoenix Chat: phoenix dengan sayap api (sama dengan favicon dan ikon aplikasi).
+export function PhoenixLogo({ size = 28 }) {
+  return (
+    <svg width={size} height={size} viewBox="4 2 56 60" aria-hidden="true">
+    <path fill="#FF7A33" d="M30 27C24 22 15 17 7 9C10 17 12 21 17 25C13 25 10 24 7 23C11 28 16 31 22 32C19 33 16 33 13 33C18 37 24 37 29 35Z"/>
+    <path fill="#FF7A33" d="M34 27C40 22 49 17 57 9C54 17 52 21 47 25C51 25 54 24 57 23C53 28 48 31 42 32C45 33 48 33 51 33C46 37 40 37 35 35Z"/>
+    <path fill="#E8452C" d="M32 44C30 49 27 53 22 56C26 56 29 54 31 52C31 55 31 58 32 61C33 58 33 55 33 52C35 54 38 56 42 56C37 53 34 49 32 44Z"/>
+    <path fill="#FFB347" d="M32 15C36.5 20 37.5 28 36.5 36C35.5 41 34 44 32 47C30 44 28.5 41 27.5 36C26.5 28 27.5 20 32 15Z"/>
+    <circle fill="#FFD36B" cx="32" cy="12.5" r="3.2"/>
+    <path fill="#FFD36B" d="M32 9.5C31 7 32 5 34 4C33 6 34 7 33.5 9Z"/>
+    </svg>
+  );
 }

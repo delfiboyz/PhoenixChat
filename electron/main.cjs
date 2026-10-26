@@ -1,7 +1,12 @@
 // Aplikasi desktop: menyalakan core (Tor + server lokal) lalu membuka jendela
 // yang hanya boleh memuat antarmuka lokal.
 const { app, BrowserWindow, session } = require('electron');
+const fs = require('node:fs');
 const path = require('node:path');
+
+// Data versi sebelum berganti nama (chat-lokal) tetap dipakai jika sudah ada.
+const legacyData = path.join(app.getPath('appData'), 'chat-lokal');
+if (fs.existsSync(legacyData)) app.setPath('userData', legacyData);
 
 let running = null;
 
@@ -20,8 +25,9 @@ async function createWindow() {
     height: 760,
     minWidth: 360,
     minHeight: 560,
-    backgroundColor: '#F3F4EF',
-    title: 'Chat Lokal',
+    backgroundColor: '#121014',
+    title: 'Phoenix Chat',
+    icon: path.join(__dirname, 'icon.png'),
     autoHideMenuBar: true,
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
   });

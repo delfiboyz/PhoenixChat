@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api.js';
-import { Icon } from '../ui.jsx';
+import { PhoenixLogo } from '../ui.jsx';
 import { t } from '../i18n.js';
 
 export default function Lock({ onUnlock }) {
@@ -17,7 +17,7 @@ export default function Lock({ onUnlock }) {
   };
   return (
     <form className="lock" onSubmit={submit}>
-      <div className="brand-mark" style={{ width: 56, height: 56, borderRadius: 16 }}><Icon.lock size={26} /></div>
+      <div className="brand-mark" style={{ width: 64, height: 64, borderRadius: 18 }}><PhoenixLogo size={46} /></div>
       <h1 className="h-display" style={{ fontSize: 28 }}>{t('lock.title')}</h1>
       <label htmlFor="pin" className="hint">{t('lock.enter')}</label>
       <input id="pin" className="input" type="password" inputMode="numeric" autoFocus maxLength={8}

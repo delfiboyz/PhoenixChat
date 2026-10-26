@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
 
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
         web = WebView(this).apply {
-            setBackgroundColor(0xFFF3F4EF.toInt())
+            setBackgroundColor(0xFF121014.toInt())
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.allowFileAccess = false
