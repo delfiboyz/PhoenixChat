@@ -83,7 +83,13 @@ class TorNetwork(
         Regex(":(\\d+)").find(conn.getInfo("net/listeners/socks") ?: "")?.groupValues?.get(1)?.toIntOrNull() ?: 9050
 
     init {
-        ticker.scheduleWithFixedDelay({ runCatching { tick() } }, 1, 1, TimeUnit.SECONDS)
+        ticker.scheduleWithFixedDelay({
+            try {
+                tick()
+            } catch (e: Throwable) {
+                Log.w("PhoenixChat", "Pemantauan Tor gagal", e)
+            }
+        }, 1, 1, TimeUnit.SECONDS)
     }
 
     override fun state(): JSONObject = JSONObject()
@@ -181,10 +187,15 @@ class TorNetwork(
         val info = try {
             conn.getInfo("status/bootstrap-phase")
         } catch (e: Exception) {
+            Log.w("PhoenixChat", "GETINFO gagal, sambung ulang port kontrol", e)
             ctl = null // koneksi putus; sambung ulang di detik berikutnya
             return
         } ?: return
-        val p = Regex("PROGRESS=(\\d+)").find(info)?.groupValues?.get(1)?.toIntOrNull() ?: return
+        val p = Regex("PROGRESS=(\\d+)").find(info)?.groupValues?.get(1)?.toIntOrNull()
+        if (p == null) {
+            Log.w("PhoenixChat", "Status bootstrap tidak terbaca: $info")
+            return
+        }
         if (p >= 100) {
             if (client == null || phase != "ready") client = buildClient(socksPort(conn))
             set("ready", 100)

@@ -100,6 +100,11 @@ private class EventStream : InputStream() {
 class UiServer(port: Int, private val core: Core, private val token: String, private val assets: AssetManager) :
     NanoHTTPD("127.0.0.1", port) {
     private val clients = CopyOnWriteArrayList<EventStream>()
+
+    // SSE tanpa gzip: kompresor menahan data sampai aliran ditutup, sehingga event tidak pernah sampai.
+    // NanoHTTPD memutuskan gzip lewat fungsi ini setelah serve(), jadi harus di-override di sini.
+    override fun useGzipWhenAccepted(r: Response): Boolean =
+        r.mimeType?.startsWith("text/event-stream") != true && super.useGzipWhenAccepted(r)
     private val allowedHosts = setOf("127.0.0.1", "localhost")
 
     init {
