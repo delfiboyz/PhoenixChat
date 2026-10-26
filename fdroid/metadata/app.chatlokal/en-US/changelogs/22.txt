@@ -1,0 +1,1 @@
+New Tor route screen: see the relays your messages pass through (guard, middle relay, rendezvous point) and who sees what. Fix: messages not sent and contacts shown offline after Tor's control connection dropped.

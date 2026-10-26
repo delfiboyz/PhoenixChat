@@ -16,6 +16,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 import net.freehaven.tor.control.TorControlConnection
 import org.torproject.jni.TorService
@@ -45,7 +46,9 @@ class TorNetwork(
     @Volatile private var startedAt = 0L
     @Volatile private var bridge: JSONObject = JSONObject().put("type", "none")
     @Volatile private var client: OkHttpClient? = null
+    @Volatile private var socks = 0
     @Volatile private var ctl: TorControlConnection? = null
+    @Volatile private var ctlSocket: LocalSocket? = null
     private var pt: IPtProxy.Controller? = null
 
     private val connection = object : ServiceConnection {
@@ -64,19 +67,31 @@ class TorNetwork(
         ctl?.let { return it }
         val sock = File(context.getDir("TorService", Context.MODE_PRIVATE), "data/ControlSocket")
         if (!sock.exists()) return null
+        val ls = LocalSocket()
         return try {
-            val ls = LocalSocket()
             ls.connect(LocalSocketAddress(sock.path, LocalSocketAddress.Namespace.FILESYSTEM))
             val c = TorControlConnection(ls.inputStream, ls.outputStream)
             c.launchThread(true)
             c.authenticate(ByteArray(0))
             c.setConf(listOf("DisableNetwork 0"))
+            ctlSocket = ls
             ctl = c
             c
         } catch (e: Exception) {
             Log.w("PhoenixChat", "Port kontrol belum siap: ${e.message}")
+            runCatching { ls.close() }
             null
         }
+    }
+
+    // Layanan onion dari ADD_ONION terikat pada koneksi kontrol yang membuatnya dan
+    // ikut hilang saat koneksi itu putus (atau tor dimulai ulang). Tutup koneksi lama
+    // dan lupakan serviceId agar tick() mendaftarkan layanan onion lagi.
+    private fun dropControl() {
+        runCatching { ctlSocket?.close() }
+        ctlSocket = null
+        ctl = null
+        serviceId = null
     }
 
     private fun socksPort(conn: TorControlConnection): Int =
@@ -188,7 +203,7 @@ class TorNetwork(
             conn.getInfo("status/bootstrap-phase")
         } catch (e: Exception) {
             Log.w("PhoenixChat", "GETINFO gagal, sambung ulang port kontrol", e)
-            ctl = null // koneksi putus; sambung ulang di detik berikutnya
+            dropControl() // koneksi putus; sambung ulang di detik berikutnya
             return
         } ?: return
         val p = Regex("PROGRESS=(\\d+)").find(info)?.groupValues?.get(1)?.toIntOrNull()
@@ -197,7 +212,12 @@ class TorNetwork(
             return
         }
         if (p >= 100) {
-            if (client == null || phase != "ready") client = buildClient(socksPort(conn))
+            // Port SOCKS bisa berganti bila tor dimulai ulang; klien lama lalu gagal terus.
+            val port = socksPort(conn)
+            if (client == null || phase != "ready" || port != socks) {
+                client = buildClient(port)
+                socks = port
+            }
             set("ready", 100)
         } else if (phase == "error") {
             // tetap error sampai pengguna mencoba lagi
@@ -261,6 +281,44 @@ class TorNetwork(
         val req = Request.Builder().url(target(address) + "/inbox")
             .post(envelope.toString().toRequestBody("application/json".toMediaType())).build()
         c.newCall(req).execute().use { if (!it.isSuccessful) throw IllegalStateException("HTTP ${it.code}") }
+    }
+
+    // Baris circuit-status: "ID STATUS $FP~nama,$FP~nama KEY=VAL ...". Padanan server/torctl.js.
+    override fun circuits(): JSONArray? {
+        if (phase != "ready") return null
+        val conn = control() ?: return null
+        val relays = HashMap<String, JSONObject>()
+        val out = JSONArray()
+        for (line in conn.getInfo("circuit-status").orEmpty().lines()) {
+            val p = line.trim().split(' ')
+            if (p.size < 3 || p[1] != "BUILT" || !p[2].startsWith("$")) continue
+            val kv = p.drop(3).filter { '=' in it }.associate { it.substringBefore('=') to it.substringAfter('=') }
+            val hops = JSONArray()
+            p[2].split(',').forEachIndexed { i, h ->
+                val fp = h.drop(1).split('~', '=')[0].uppercase()
+                val nick = h.drop(1).split('~', '=').getOrNull(1)
+                val info = relays.getOrPut(fp) { relay(conn, fp, i == 0) }
+                hops.put(JSONObject(info.toString()).put("fp", fp).put("nick", nick ?: JSONObject.NULL))
+            }
+            out.put(JSONObject().put("id", p[0]).put("purpose", kv["PURPOSE"] ?: "GENERAL")
+                .put("rendQuery", kv["REND_QUERY"] ?: JSONObject.NULL).put("hops", hops))
+        }
+        return out
+    }
+
+    private fun relay(conn: TorControlConnection, fp: String, first: Boolean): JSONObject {
+        // "r nama identitas digest tanggal jam IP ORPort DirPort"
+        var ip = runCatching { conn.getInfo("ns/id/$fp") }.getOrNull()
+            ?.lines()?.find { it.startsWith("r ") }?.split(' ')?.getOrNull(6)
+        // Bridge tidak ada di konsensus; alamatnya diambil dari baris bridge di pengaturan.
+        val isBridge = ip == null && first && bridge.optString("type", "none") != "none"
+        if (isBridge) {
+            ip = bridge.optString("lines").lines().find { it.uppercase().contains(fp) }?.trim()?.removePrefix("Bridge ")?.trim()
+                ?.split(Regex("\\s+"))?.let { parts -> if (parts[0].firstOrNull()?.let { it.isDigit() || it == '[' } == true) parts[0] else parts.getOrNull(1) }
+                ?.replace(Regex("^\\[(.*)\\]:\\d+$"), "$1")?.replace(Regex(":\\d+$"), "")
+        }
+        val country = ip?.let { a -> runCatching { conn.getInfo("ip-to-country/$a") }.getOrNull()?.takeIf { Regex("^[a-zA-Z]{2}$").matches(it) }?.uppercase() }
+        return JSONObject().put("ip", ip ?: JSONObject.NULL).put("country", country ?: JSONObject.NULL).put("bridge", isBridge)
     }
 
     override fun ping(address: String): Boolean = try {

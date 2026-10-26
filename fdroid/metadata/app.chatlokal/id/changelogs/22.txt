@@ -1,0 +1,1 @@
+Layar baru Rute Tor: lihat relay yang dilewati pesanmu (gerbang, relay tengah, titik temu) beserta penjelasan siapa melihat apa. Perbaikan: pesan tidak terkirim dan kontak tampil offline setelah koneksi kontrol Tor terputus.

@@ -17,6 +17,9 @@ const DAY = 24 * 60 * 60 * 1000;
 const MB = 1024 * 1024;
 const RETRY_STEPS = [5000, 15000, 30000, 60000, 120000];
 
+// Tujuan sirkuit Tor yang ditampilkan di layar Rute Tor.
+const CIRCUIT_KINDS = { HS_CLIENT_REND: 'out', HS_SERVICE_REND: 'in', HS_SERVICE_INTRO: 'intro' };
+
 const DEFAULT_SETTINGS = {
   autoDelete: true,
   readReceipts: true,
@@ -32,12 +35,13 @@ export const limitBytes = (limit) => (limit === 'none' ? Infinity : Number(limit
 const contactIdOf = (publicKey) => crypto.createHash('sha256').update(publicKey).digest('hex').slice(0, 16);
 
 export class Core extends EventEmitter {
-  constructor({ dataDir, direct, socksPort, peerPort }) {
+  constructor({ dataDir, direct, socksPort, controlPort, peerPort }) {
     super();
     this.dataDir = dataDir;
     this.peerPort = peerPort;
     this.direct = direct;
     this.socksPort = socksPort;
+    this.controlPort = controlPort;
     this.store = new Store(dataDir);
     this.tor = null;
     this.transport = null;
@@ -97,7 +101,7 @@ export class Core extends EventEmitter {
       return;
     }
     if (!this.tor) {
-      this.tor = new Tor({ dataDir: this.dataDir, peerPort: this.identity.peerPort, socksPort: this.socksPort });
+      this.tor = new Tor({ dataDir: this.dataDir, peerPort: this.identity.peerPort, socksPort: this.socksPort, controlPort: this.controlPort });
       this.tor.on('state', (s) => {
         if (s.phase === 'ready') this.flushAll(true);
         this.changed('network');
@@ -107,6 +111,26 @@ export class Core extends EventEmitter {
     this.tor.start(this.settings.bridge);
     await this.tor.waitAddress(15000);
     this.changed('network');
+  }
+
+  // Rute relay untuk layar Rute Tor. Sirkuit ke kontak dikenali dari REND_QUERY;
+  // sirkuit masuk tidak menyebut pengirimnya, jadi kontaknya tidak bisa diketahui.
+  async circuits() {
+    let raw = null;
+    try {
+      raw = this.direct ? null : await this.tor?.circuits(this.settings.bridge);
+    } catch {
+      raw = null;
+    }
+    if (!raw) return { available: false, bridge: this.settings.bridge.type, circuits: [] };
+    const byOnion = new Map(Object.values(this.contacts).map((c) => [c.address, c]));
+    const circuits = raw.map((c) => {
+      const kind = CIRCUIT_KINDS[c.purpose];
+      const contact = kind === 'out' ? byOnion.get(`${c.rendQuery}.onion`) : null;
+      if (!kind || (kind === 'out' && !contact)) return null;
+      return { id: c.id, kind, contact: contact ? { id: contact.id, name: contact.name, color: contact.color } : null, hops: c.hops };
+    }).filter(Boolean);
+    return { available: true, bridge: this.settings.bridge.type, circuits };
   }
 
   restartNetwork() {

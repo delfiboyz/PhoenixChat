@@ -249,6 +249,14 @@ export default function Settings({ status, rev, go, toast, refresh, lang, onLang
               </button>
             )}
           </div>
+          {!net.direct && (
+            <div className="card" style={{ overflow: 'hidden' }}>
+              <button type="button" className="list-btn" onClick={() => go({ name: 'route' })}>
+                <Icon.onion size={20} />
+                <span className="t"><strong>{t('set.route')}</strong><span>{t('set.routeNote')}</span></span>
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="group">

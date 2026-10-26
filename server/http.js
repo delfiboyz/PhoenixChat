@@ -105,6 +105,7 @@ export function createUiServer(core, { token, distDir, allowedHosts }) {
   route('PATCH', '/api/settings', async (req) => { core.patchSettings(await jsonBody(req)); return core.publicSettings(); });
   route('POST', '/api/me', async (req) => { core.setName((await jsonBody(req)).name); return core.status(); });
   route('POST', '/api/pin', async (req) => { core.setPin((await jsonBody(req)).pin ?? null); return core.publicSettings(); });
+  route('GET', '/api/network/circuits', () => core.circuits());
   route('POST', '/api/network/retry', () => { core.restartNetwork(); return {}; });
   route('POST', '/api/wipe', () => { core.wipe(); return core.status(); });
 

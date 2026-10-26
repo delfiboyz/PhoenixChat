@@ -19,6 +19,8 @@ interface Network {
     fun forgetOnion()
     fun send(address: String, envelope: JSONObject)
     fun ping(address: String): Boolean
+    // Sirkuit BUILT dari port kontrol: {id, purpose, rendQuery, hops: [{fp, nick, ip, country, bridge}]}.
+    fun circuits(): JSONArray?
 }
 
 class Core(val dataDir: File, private val peerPort: Int, private val net: Network) {
@@ -120,6 +122,28 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
     }
 
     fun retryNetwork() = net.retry()
+
+    // Rute relay untuk layar Rute Tor. Sirkuit ke kontak dikenali dari REND_QUERY;
+    // sirkuit masuk tidak menyebut pengirimnya, jadi kontaknya tidak bisa diketahui.
+    fun circuits(): JSONObject {
+        val bridgeType = settings.getJSONObject("bridge").optString("type", "none")
+        val raw = runCatching { net.circuits() }.getOrNull()
+            ?: return JSONObject().put("available", false).put("bridge", bridgeType).put("circuits", JSONArray())
+        val byOnion = synchronized(this) { contacts.keys().asSequence().mapNotNull { contacts.optJSONObject(it) }.associateBy { it.optString("address") } }
+        val out = JSONArray()
+        raw.objs().forEach { c ->
+            val kind = when (c.optString("purpose")) {
+                "HS_CLIENT_REND" -> "out"
+                "HS_SERVICE_REND" -> "in"
+                "HS_SERVICE_INTRO" -> "intro"
+                else -> return@forEach
+            }
+            val contact = if (kind == "out") byOnion[c.optString("rendQuery") + ".onion"] ?: return@forEach else null
+            out.put(JSONObject().put("id", c.getString("id")).put("kind", kind).put("hops", c.getJSONArray("hops"))
+                .put("contact", contact?.let { JSONObject().put("id", it.getString("id")).put("name", it.getString("name")).put("color", it.optInt("color")) } ?: JSONObject.NULL))
+        }
+        return JSONObject().put("available", true).put("bridge", bridgeType).put("circuits", out)
+    }
 
     // Dipanggil oleh lapisan Tor saat status berubah.
     fun networkChanged() {

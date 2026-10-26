@@ -51,6 +51,7 @@ export const api = {
   setName: (name) => call('POST', '/api/me', { name }),
   setPin: (pin) => call('POST', '/api/pin', { pin }),
   retryNetwork: () => call('POST', '/api/network/retry'),
+  circuits: () => call('GET', '/api/network/circuits'),
   exportBackup: (password) => call('POST', '/api/backup/export', { password }),
   wipe: () => call('POST', '/api/wipe'),
 };

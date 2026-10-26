@@ -5,6 +5,7 @@ import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import path from 'node:path';
 import { UserError } from './i18n.js';
+import { openControl, readCircuits } from './torctl.js';
 
 function which(bin) {
   try {
@@ -15,11 +16,12 @@ function which(bin) {
 }
 
 export class Tor extends EventEmitter {
-  constructor({ dataDir, peerPort, socksPort, torPath }) {
+  constructor({ dataDir, peerPort, socksPort, controlPort, torPath }) {
     super();
     this.dir = path.join(dataDir, 'tor');
     this.peerPort = peerPort;
     this.socksPort = socksPort;
+    this.controlPort = controlPort;
     this.torPath = torPath || process.env.TOR_PATH || which('tor');
     this.state = { phase: 'idle', progress: 0, error: null, address: null };
     this.proc = null;
@@ -34,7 +36,10 @@ export class Tor extends EventEmitter {
     const lines = [
       `DataDirectory ${path.join(this.dir, 'data')}`,
       `SocksPort 127.0.0.1:${this.socksPort}`,
-      'ControlPort 0',
+      // Port kontrol hanya untuk membaca sirkuit (layar Rute Tor), dijaga cookie.
+      this.controlPort ? `ControlPort 127.0.0.1:${this.controlPort}` : 'ControlPort 0',
+      'CookieAuthentication 1',
+      `CookieAuthFile ${this.cookieFile()}`,
       'Log notice stdout',
       `HiddenServiceDir ${path.join(this.dir, 'hs')}`,
       'HiddenServiceVersion 3',
@@ -109,6 +114,21 @@ export class Tor extends EventEmitter {
       }
     }
     if (/\[err\]/.test(l)) this.set({ phase: 'error', error: l.replace(/^.*\[err\]\s*/, '') });
+  }
+
+  cookieFile() {
+    return path.join(this.dir, 'control_auth_cookie');
+  }
+
+  // Sirkuit yang sedang dipakai, lengkap dengan IP dan negara tiap relay.
+  async circuits(bridge) {
+    if (!this.controlPort || this.state.phase !== 'ready') return null;
+    const ctl = await openControl(this.controlPort, this.cookieFile());
+    try {
+      return await readCircuits(ctl, bridge);
+    } finally {
+      ctl.close();
+    }
   }
 
   // Alamat .onion v3 dibuat tor dari kunci di folder hs.

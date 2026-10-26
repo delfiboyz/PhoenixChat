@@ -149,6 +149,7 @@ class UiServer(port: Int, private val core: Core, private val token: String, pri
         Route(Method.PATCH, "/api/settings", { s, _ -> core.patchSettings(json(s)); core.publicSettings() }),
         Route(Method.POST, "/api/me", { s, _ -> core.setName(json(s).str("name")); core.status() }),
         Route(Method.POST, "/api/pin", { s, _ -> core.setPin(json(s).str("pin")); core.publicSettings() }),
+        Route(Method.GET, "/api/network/circuits", { _, _ -> core.circuits() }),
         Route(Method.POST, "/api/network/retry", { _, _ -> core.retryNetwork(); JSONObject() }),
         Route(Method.POST, "/api/wipe", { _, _ -> core.wipe(); core.status() }),
     )

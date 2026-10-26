@@ -8,11 +8,12 @@ import ChatList from './screens/ChatList.jsx';
 import ChatRoom from './screens/ChatRoom.jsx';
 import AddContact from './screens/AddContact.jsx';
 import Settings from './screens/Settings.jsx';
+import TorRoute from './screens/TorRoute.jsx';
 
 export default function App() {
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
-  const [view, setView] = useState(null); // null | {name:'chat',id} | {name:'add'} | {name:'settings'}
+  const [view, setView] = useState(null); // null | {name:'chat',id} | {name:'add'} | {name:'settings'} | {name:'route',cid?,contactName?}
   const [rev, setRev] = useState(0);
   const [toast, setToast] = useState(null);
   const [lang, setLangState] = useState(getLang());
@@ -84,6 +85,7 @@ export default function App() {
   if (view?.name === 'chat') main = <ChatRoom key={view.id} id={view.id} {...ctx} />;
   else if (view?.name === 'add') main = <AddContact key={view.code || 'add'} initialCode={view.code} {...ctx} />;
   else if (view?.name === 'settings') main = <Settings {...ctx} />;
+  else if (view?.name === 'route') main = <TorRoute key={view.cid || 'all'} cid={view.cid} name={view.contactName} {...ctx} />;
   else {
     main = (
       <div className="placeholder-main">

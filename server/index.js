@@ -32,7 +32,8 @@ export async function startApp({ dataDir, uiPort = 0, direct = false, distDir = 
   const identity = new Store(dataDir).read('identity.json', null);
   const peerPort = identity?.peerPort || await freePort();
   const socksPort = direct ? 0 : await freePort();
-  const core = new Core({ dataDir, direct, socksPort, peerPort });
+  const controlPort = direct ? 0 : await freePort();
+  const core = new Core({ dataDir, direct, socksPort, controlPort, peerPort });
 
   const peer = createPeerServer(core);
   await listen(peer, peerPort);

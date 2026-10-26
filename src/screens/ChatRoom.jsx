@@ -130,6 +130,11 @@ export default function ChatRoom({ id, rev, go, toast, status }) {
           <div className="kv"><span>{t('room.contactId')}</span><span>{contact.deviceId}</span></div>
           <div className="kv"><span>{t('room.address')}</span><span>{contact.address}</span></div>
           <p className="hint" style={{ margin: 0 }}>{t('room.verifyHint')}</p>
+          {!direct && !pending && (
+            <button type="button" className="btn" onClick={() => go({ name: 'route', cid: id, contactName: contact.name })}>
+              <Icon.onion size={18} />{t('room.route')}
+            </button>
+          )}
           <div className="two">
             <button type="button" className="btn" onClick={() => setConfirm('block')}>{t('room.block')}</button>
             <button type="button" className="btn" style={{ color: 'var(--danger)', borderColor: 'var(--danger-line)' }} onClick={() => setConfirm('delete')}>{t('room.delete')}</button>
