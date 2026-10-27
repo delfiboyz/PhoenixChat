@@ -4,6 +4,22 @@ Phoenix Chat adalah aplikasi chat tanpa akun dan tanpa database, dengan tampilan
 
 Desain mengikuti canvas "Desain Aplikasi Chat Lokal" (5 layar) dan arsitektur mengikuti "Dokumen Desain — Chat Lokal". Ada dua versi dengan protokol yang sama, jadi penggunanya bisa saling mengobrol: aplikasi desktop (Electron, `server/`) dan aplikasi Android (Kotlin, `android/`). Keduanya memakai antarmuka React yang sama (`src/`).
 
+## Tampilan
+
+<table>
+<tr>
+<td align="center" width="25%"><img src="docs/screenshots/1-mulai.png" alt="Mulai: buat identitas tanpa akun" width="200"><br><sub>Mulai: buat identitas tanpa akun</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/2-obrolan.png" alt="Daftar obrolan" width="200"><br><sub>Daftar obrolan</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/3-ruang-obrolan.png" alt="Ruang obrolan" width="200"><br><sub>Ruang obrolan</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/7-permintaan.png" alt="Permintaan kontak baru" width="200"><br><sub>Permintaan kontak baru</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><img src="docs/screenshots/4-tambah-kontak.png" alt="Tambah kontak dengan kode QR" width="200"><br><sub>Tambah kontak dengan kode QR</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/5-pengaturan.png" alt="Pengaturan" width="200"><br><sub>Pengaturan</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/6-rute-tor.png" alt="Rute Tor: relay yang dilewati pesan" width="200"><br><sub>Rute Tor: relay yang dilewati pesan</sub></td>
+</tr>
+</table>
+
 ## Unduh
 
 ### F-Droid
