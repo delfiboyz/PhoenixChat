@@ -57,6 +57,6 @@ export class Transport {
   }
 
   ping(address) {
-    return this.request(address, 'GET', '/ping', null, 45000).then(() => true, () => false);
+    return this.request(address, 'GET', '/ping', null, 60000).then(() => true, () => false);
   }
 }

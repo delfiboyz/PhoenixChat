@@ -1,0 +1,1 @@
+Fix: contacts no longer stay offline while Tor is connected. Online status is now checked as soon as Tor is ready and regularly afterwards, and problems with this device's own Tor no longer mark contacts offline.

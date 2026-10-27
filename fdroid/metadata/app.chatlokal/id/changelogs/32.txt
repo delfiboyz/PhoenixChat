@@ -1,0 +1,1 @@
+Perbaikan: kontak tidak lagi tertahan offline padahal Tor sudah tersambung. Status online kini diperiksa begitu Tor siap dan berkala sesudahnya, dan gangguan Tor di perangkat sendiri tidak lagi membuat kontak tampil offline.

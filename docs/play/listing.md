@@ -116,3 +116,14 @@ New Tor route screen: see the relays your messages pass through (guard, middle r
 Layar baru Rute Tor: lihat relay yang dilewati pesanmu (gerbang, relay tengah, titik temu) dan siapa melihat apa. Perbaikan: pesan tidak terkirim dan kontak tampil offline setelah koneksi kontrol Tor terputus.
 </id>
 ```
+
+## Catatan rilis (Release notes) versi 0.2.1
+
+```
+<en-US>
+Fix: contacts no longer stay offline while Tor is connected. Online status is now checked as soon as Tor is ready and regularly afterwards.
+</en-US>
+<id>
+Perbaikan: kontak tidak lagi tertahan offline padahal Tor sudah tersambung. Status online kini diperiksa begitu Tor siap dan berkala sesudahnya.
+</id>
+```

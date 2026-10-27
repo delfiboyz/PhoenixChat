@@ -35,6 +35,8 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
         private set
 
     private val pool = Executors.newScheduledThreadPool(3)
+    // Ping bisa menunggu sampai batas waktu Tor; jangan sampai menahan pengiriman pesan di pool.
+    private val pinger = Executors.newFixedThreadPool(4)
     private val flushing = ConcurrentHashMap.newKeySet<String>()
     private val backoff = ConcurrentHashMap<String, LongArray>() // [step, nextAt]
     private val fileRequests = ConcurrentHashMap.newKeySet<String>()
@@ -44,6 +46,9 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
         private const val DAY = 24L * 60 * 60 * 1000
         private const val MB = 1024L * 1024
         private val RETRY = longArrayOf(5000, 15000, 30000, 60000, 120000)
+        // Jeda cek status online berkala: lebih jarang untuk kontak yang sudah terlihat online.
+        private const val PRESENCE_ONLINE = 2 * 60 * 1000L
+        private const val PRESENCE_OFFLINE = 60 * 1000L
 
         fun defaultSettings(): JSONObject = JSONObject()
             .put("autoDelete", true)
@@ -63,6 +68,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
         load()
         locked = settings.opt("pin") is JSONObject
         pool.scheduleWithFixedDelay({ runCatching { flushAll(false) } }, 5, 5, TimeUnit.SECONDS)
+        pool.scheduleWithFixedDelay({ runCatching { checkPresence(false) } }, 30, 30, TimeUnit.SECONDS)
         pool.scheduleWithFixedDelay({ runCatching { sweep() } }, 1, 60, TimeUnit.MINUTES)
     }
 
@@ -147,7 +153,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
 
     // Dipanggil oleh lapisan Tor saat status berubah.
     fun networkChanged() {
-        if (net.state().optString("phase") == "ready") pool.execute { flushAll(true) }
+        if (net.state().optString("phase") == "ready") pool.execute { flushAll(true); checkPresence(true) }
         changed("network")
     }
 
@@ -315,20 +321,39 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
     fun chat(cid: String): JSONObject {
         val c = synchronized(this) { contact(cid) } ?: throw UserError("noChat")
         // Cek apakah teman sedang online, paling sering tiap 30 detik.
-        if (c.optString("status") == "ok" && System.currentTimeMillis() - c.optLong("lastCheck") > 30000) {
-            c.put("lastCheck", System.currentTimeMillis())
-            pool.execute {
-                val ok = net.ping(c.getString("address"))
-                synchronized(this) { c.put("online", ok); saveContacts() }
-                changed("contacts", cid)
-                if (ok) flush(cid, true)
-            }
-        }
+        if (c.optString("status") == "ok" && System.currentTimeMillis() - c.optLong("lastCheck") > 30000) ping(c)
         val contact = JSONObject()
             .put("id", c.getString("id")).put("name", c.getString("name")).put("color", c.optInt("color"))
             .put("status", c.optString("status")).put("online", c.opt("online"))
             .put("deviceId", Crypto.deviceId(c.getString("address"))).put("address", c.getString("address"))
         return JSONObject().put("contact", contact).put("messages", messages(cid))
+    }
+
+    private fun ready() = net.state().optString("phase") == "ready"
+
+    // Cek status online semua kontak saat Tor baru siap dan berkala sesudahnya, agar
+    // status tidak tertahan "offline" sampai obrolannya dibuka.
+    private fun checkPresence(force: Boolean) {
+        val list = synchronized(this) { contacts.keys().asSequence().mapNotNull { contacts.optJSONObject(it) }.toList() }
+        for (c in list) {
+            val every = if (c.opt("online") == true) PRESENCE_ONLINE else PRESENCE_OFFLINE
+            if (c.optString("status") == "ok" && (force || System.currentTimeMillis() - c.optLong("lastCheck") > every)) ping(c)
+        }
+    }
+
+    private fun ping(c: JSONObject) {
+        if (!ready()) return
+        synchronized(this) { c.put("lastCheck", System.currentTimeMillis()) }
+        pinger.execute {
+            val ok = net.ping(c.getString("address"))
+            // Tor perangkat ini berhenti di tengah jalan: bukan berarti teman offline.
+            if (!ok && !ready()) return@execute
+            val changedNow = synchronized(this) {
+                (c.opt("online") != ok).also { if (it) { c.put("online", ok); saveContacts() } }
+            }
+            if (changedNow) changed("contacts", c.getString("id"))
+            if (ok) flush(c.getString("id"), true)
+        }
     }
 
     fun markRead(cid: String) {
@@ -447,7 +472,7 @@ class Core(val dataDir: File, private val peerPort: Int, private val net: Networ
                 } catch (e: Exception) {
                     val step = minOf(b[0] + 1, (RETRY.size - 1).toLong())
                     backoff[cid] = longArrayOf(step, System.currentTimeMillis() + RETRY[step.toInt()])
-                    if (c.opt("online") != false) {
+                    if (c.opt("online") != false && ready()) {
                         synchronized(this) { c.put("online", false); saveContacts() }
                         changed("contacts", cid)
                     }

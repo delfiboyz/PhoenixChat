@@ -16,6 +16,9 @@ import { Transport } from './transport.js';
 const DAY = 24 * 60 * 60 * 1000;
 const MB = 1024 * 1024;
 const RETRY_STEPS = [5000, 15000, 30000, 60000, 120000];
+// Jeda cek status online berkala: lebih jarang untuk kontak yang sudah terlihat online.
+const PRESENCE_ONLINE = 2 * 60 * 1000;
+const PRESENCE_OFFLINE = 60 * 1000;
 
 // Tujuan sirkuit Tor yang ditampilkan di layar Rute Tor.
 const CIRCUIT_KINDS = { HS_CLIENT_REND: 'out', HS_SERVICE_REND: 'in', HS_SERVICE_INTRO: 'intro' };
@@ -51,6 +54,7 @@ export class Core extends EventEmitter {
     this.load();
     this.locked = Boolean(this.settings.pin);
     this.retryTimer = setInterval(() => this.flushAll(), 5000);
+    this.presenceTimer = setInterval(() => this.checkPresence(), 30000);
     this.sweepTimer = setInterval(() => this.sweep(), 60 * 60 * 1000);
   }
 
@@ -103,7 +107,10 @@ export class Core extends EventEmitter {
     if (!this.tor) {
       this.tor = new Tor({ dataDir: this.dataDir, peerPort: this.identity.peerPort, socksPort: this.socksPort, controlPort: this.controlPort });
       this.tor.on('state', (s) => {
-        if (s.phase === 'ready') this.flushAll(true);
+        if (s.phase === 'ready') {
+          this.flushAll(true);
+          this.checkPresence(true);
+        }
         this.changed('network');
       });
     }
@@ -278,17 +285,33 @@ export class Core extends EventEmitter {
     const c = this.contacts[cid];
     if (!c) throw new UserError('noChat');
     // Cek apakah teman sedang online, paling sering tiap 30 detik.
-    if (c.status === 'ok' && this.transport && Date.now() - c.lastCheck > 30000) {
-      c.lastCheck = Date.now();
-      this.transport.ping(c.address).then((ok) => {
-        c.online = ok;
-        this.saveContacts();
-        this.changed('contacts', cid);
-        if (ok) this.flush(cid, true);
-      });
-    }
+    if (c.status === 'ok' && Date.now() - c.lastCheck > 30000) this.ping(c);
     const contact = { id: c.id, name: c.name, color: c.color, status: c.status, online: c.online, deviceId: deviceId(c.address), address: c.address };
     return { contact, messages: this.messages(cid) };
+  }
+
+  // Cek status online semua kontak saat Tor baru siap dan berkala sesudahnya, agar
+  // status tidak tertahan "offline" sampai obrolannya dibuka.
+  checkPresence(force) {
+    for (const c of Object.values(this.contacts)) {
+      const every = c.online ? PRESENCE_ONLINE : PRESENCE_OFFLINE;
+      if (c.status === 'ok' && (force || Date.now() - c.lastCheck > every)) this.ping(c);
+    }
+  }
+
+  ping(c) {
+    if (!this.transport || this.networkState().phase !== 'ready') return;
+    c.lastCheck = Date.now();
+    this.transport.ping(c.address).then((ok) => {
+      // Tor perangkat ini berhenti di tengah jalan: bukan berarti teman offline.
+      if (!ok && this.networkState().phase !== 'ready') return;
+      if (c.online !== ok) {
+        c.online = ok;
+        this.saveContacts();
+        this.changed('contacts', c.id);
+      }
+      if (ok) this.flush(c.id, true);
+    });
   }
 
   markRead(cid) {
@@ -393,7 +416,7 @@ export class Core extends EventEmitter {
         } catch {
           const step = Math.min(b.step + 1, RETRY_STEPS.length - 1);
           this.backoff.set(cid, { step, next: Date.now() + RETRY_STEPS[step] });
-          if (c.online !== false) { c.online = false; this.saveContacts(); this.changed('contacts', cid); }
+          if (c.online !== false && this.networkState().phase === 'ready') { c.online = false; this.saveContacts(); this.changed('contacts', cid); }
           this.markQueued(cid);
           return;
         }
@@ -594,6 +617,7 @@ export class Core extends EventEmitter {
 
   close() {
     clearInterval(this.retryTimer);
+    clearInterval(this.presenceTimer);
     clearInterval(this.sweepTimer);
     this.tor?.stop();
   }
