@@ -11,7 +11,7 @@ Batas Play: judul 30 karakter, deskripsi pendek 80, deskripsi lengkap 4000.
 - Kebijakan privasi: `https://delfiboyz.github.io/PhoenixChat/privacy/`
 
 Grafis ada di [`graphics/`](graphics/): ikon 512×512, feature graphic 1024×500, dan
-screenshot ponsel 1080×1920 (9:16) untuk `en-US` dan `id`.
+screenshot ponsel 1080×1920 (9:16) untuk `en-US` dan `id` (`5.png` = layar Rute Tor).
 
 ## English (en-US)
 
@@ -42,6 +42,7 @@ FEATURES
 • Attachments with a size limit you choose
 • Password-encrypted backups to move to a new phone (also works with the Linux desktop app)
 • PIN lock, auto-delete after 30 days, optional read receipts
+• Tor route: see the relays your messages pass through (guard, middle relay, rendezvous point) with their IP and country, and who sees what. Your ISP only sees the Tor guard's IP, and .onion chats never use an exit node
 • obfs4 and Snowflake bridges for networks that block Tor
 • Battery saver: turn off background Tor if you only need messages while the app is open
 • English and Indonesian, dark theme
@@ -82,6 +83,7 @@ FITUR
 • Lampiran dengan batas ukuran yang kamu atur sendiri
 • Cadangan terenkripsi kata sandi untuk pindah ke ponsel baru (juga bisa di aplikasi desktop Linux)
 • Kunci PIN, hapus otomatis setelah 30 hari, tanda "Dibaca" opsional
+• Rute Tor: lihat relay yang dilewati pesanmu (gerbang, relay tengah, titik temu) lengkap dengan IP dan negaranya, plus siapa melihat apa. ISP-mu hanya melihat IP gerbang Tor, dan chat lewat .onion tidak pernah memakai exit node
 • Bridge obfs4 dan Snowflake untuk jaringan yang memblokir Tor
 • Mode hemat baterai: matikan Tor di latar jika pesan cukup diterima saat aplikasi terbuka
 • Bahasa Indonesia dan Inggris, tampilan gelap
@@ -101,5 +103,16 @@ First release: account-free chat over Tor, English and Indonesian, dark theme.
 </en-US>
 <id>
 Rilis pertama: chat tanpa akun lewat Tor, bahasa Indonesia dan Inggris, tampilan gelap.
+</id>
+```
+
+## Catatan rilis (Release notes) versi 0.2.0
+
+```
+<en-US>
+New Tor route screen: see the relays your messages pass through (guard, middle relay, rendezvous point) and who sees what. Fix: messages not delivered and contacts shown offline after Tor's control connection dropped.
+</en-US>
+<id>
+Layar baru Rute Tor: lihat relay yang dilewati pesanmu (gerbang, relay tengah, titik temu) dan siapa melihat apa. Perbaikan: pesan tidak terkirim dan kontak tampil offline setelah koneksi kontrol Tor terputus.
 </id>
 ```
