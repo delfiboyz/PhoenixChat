@@ -1,0 +1,72 @@
+{
+  "timestamp": 1793127975000,
+  "version": 20002,
+  "index": {
+    "name": "/index-v2.json",
+    "sha256": "7cc6a8c19adbaa851f8d37e47a256791c8464cc4d8b5150d9b661709b135e15e",
+    "size": 10570,
+    "numPackages": 1
+  },
+  "diffs": {
+    "1793020269000": {
+      "name": "/diff/1793020269000.json",
+      "sha256": "91125401ecd910cccb81d377b4b6cea30c8a2af96d132087bb493bdb2a69f1a8",
+      "size": 10286,
+      "numPackages": 1
+    },
+    "1793020316000": {
+      "name": "/diff/1793020316000.json",
+      "sha256": "d507626b0ad68e432383b575ff0ee3a62fef088e7529ac058080912e163c2b69",
+      "size": 10132,
+      "numPackages": 1
+    },
+    "1793020326000": {
+      "name": "/diff/1793020326000.json",
+      "sha256": "d507626b0ad68e432383b575ff0ee3a62fef088e7529ac058080912e163c2b69",
+      "size": 10132,
+      "numPackages": 1
+    },
+    "1793020367000": {
+      "name": "/diff/1793020367000.json",
+      "sha256": "d507626b0ad68e432383b575ff0ee3a62fef088e7529ac058080912e163c2b69",
+      "size": 10132,
+      "numPackages": 1
+    },
+    "1793020378000": {
+      "name": "/diff/1793020378000.json",
+      "sha256": "d507626b0ad68e432383b575ff0ee3a62fef088e7529ac058080912e163c2b69",
+      "size": 10132,
+      "numPackages": 1
+    },
+    "1793048524000": {
+      "name": "/diff/1793048524000.json",
+      "sha256": "656f4d56706da6432395e33e75aa835c4c1874ddaf063606871eb02f0b6c4f28",
+      "size": 4727,
+      "numPackages": 1
+    },
+    "1793048538000": {
+      "name": "/diff/1793048538000.json",
+      "sha256": "656f4d56706da6432395e33e75aa835c4c1874ddaf063606871eb02f0b6c4f28",
+      "size": 4727,
+      "numPackages": 1
+    },
+    "1793114106000": {
+      "name": "/diff/1793114106000.json",
+      "sha256": "656f4d56706da6432395e33e75aa835c4c1874ddaf063606871eb02f0b6c4f28",
+      "size": 4727,
+      "numPackages": 1
+    },
+    "1793114116000": {
+      "name": "/diff/1793114116000.json",
+      "sha256": "656f4d56706da6432395e33e75aa835c4c1874ddaf063606871eb02f0b6c4f28",
+      "size": 4727,
+      "numPackages": 1
+    },
+    "1793127962000": {
+      "name": "/diff/1793127962000.json",
+      "sha256": "e1c592f82aad1e46a499759307ec63382f3bb123f43c445e7f35c3dbc983981c",
+      "size": 50,
+      "numPackages": 0
+    }
+  }
+}

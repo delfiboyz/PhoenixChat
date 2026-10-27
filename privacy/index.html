@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phoenix Chat · Privacy Policy</title>
+<meta name="description" content="Privacy policy for Phoenix Chat, an account-free chat app that works over Tor without servers.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+  :root { color-scheme: dark; --bg: #121014; --surface: #1C191E; --ink: #F4EEE8; --muted: #BDB4AD; --line: #2E2830; --accent: #FF7A33; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  header img { width: 44px; height: 44px; }
+  h1 { font-size: 30px; line-height: 1.2; margin: 0; }
+  h2 { font-size: 20px; margin: 32px 0 8px; color: var(--accent); }
+  p, li { color: var(--muted); }
+  strong { color: var(--ink); }
+  a { color: var(--accent); }
+  .meta { color: var(--muted); font-size: 14px; margin: 0 0 24px; }
+  .lang { display: flex; gap: 8px; margin: 16px 0 8px; }
+  .lang a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; text-decoration: none; color: var(--ink); }
+  section + section { border-top: 1px solid var(--line); margin-top: 48px; padding-top: 24px; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 15px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--ink); }
+  td { color: var(--muted); }
+  @media (max-width: 520px) { table, thead, tbody, tr, th, td { display: block; } thead { display: none; } td:first-child { color: var(--ink); font-weight: 600; border-bottom: 0; padding-bottom: 0; } }
+</style>
+</head>
+<body>
+<main>
+  <header><img src="../fdroid/repo/icons/icon.png" alt=""><h1>Phoenix Chat</h1></header>
+  <nav class="lang" aria-label="Language"><a href="#en" hreflang="en">English</a><a href="#id" hreflang="id">Bahasa Indonesia</a></nav>
+
+  <section id="en" lang="en">
+    <h1>Privacy Policy</h1>
+    <p class="meta">Effective 26 October 2026 · Applies to Phoenix Chat for Android and Linux</p>
+
+    <p><strong>Phoenix Chat collects no data.</strong> There are no accounts, no servers run by the developer, no analytics, no advertising, and no crash reporting. Everything you create in the app stays on your device or travels, end-to-end encrypted, directly to the contacts you choose.</p>
+
+    <h2>What the app stores on your device</h2>
+    <table>
+      <thead><tr><th>Data</th><th>Where it lives</th><th>Who can read it</th></tr></thead>
+      <tbody>
+        <tr><td>Nickname</td><td>Your device</td><td>You, and contacts you add</td></tr>
+        <tr><td>Identity keys and onion address</td><td>Your device</td><td>Only you; your public key and address are shared with contacts through your contact code</td></tr>
+        <tr><td>Contacts, messages, attachments</td><td>Your device</td><td>You, and the contact you exchange them with</td></tr>
+        <tr><td>Settings (language, PIN, bridges)</td><td>Your device</td><td>Only you</td></tr>
+      </tbody>
+    </table>
+
+    <h2>How messages travel</h2>
+    <p>Each device runs its own Tor onion service. Messages and attachments are encrypted on your device with the recipient's public key and sent straight to the recipient's device through the Tor network. Tor relays only carry encrypted traffic: they cannot read your messages and do not learn who is talking to whom. The developer never receives your messages, your contacts, or your IP address.</p>
+    <p>If a contact is offline, your message waits in a queue on your device until both devices are online. Nothing is stored on any third-party server.</p>
+
+    <h2>Permissions</h2>
+    <ul>
+      <li><strong>Camera</strong>: only to scan a friend's QR code. Images are processed on your device and are never saved or sent.</li>
+      <li><strong>Notifications</strong>: to show new messages and the background connection status. Notifications are created on your device; no push service is used.</li>
+      <li><strong>Internet and foreground service</strong>: to keep the Tor connection open so messages can reach you. You can turn this off with Battery saver.</li>
+    </ul>
+
+    <h2>Backups</h2>
+    <p>Backups are created only when you ask for one. The backup file is encrypted with a password you choose, and you decide where to keep it. The app's data is excluded from Android cloud backup.</p>
+
+    <h2>Deleting your data</h2>
+    <p>Use <strong>Settings → Delete all data on this device</strong>, or uninstall the app. Because there are no servers, this removes everything; the developer has nothing to delete. Messages you already sent remain on your contacts' devices until they delete them.</p>
+
+    <h2>Children</h2>
+    <p>Phoenix Chat is not directed at children under 13 and does not knowingly collect information from anyone.</p>
+
+    <h2>Changes and contact</h2>
+    <p>Changes to this policy are published on this page with a new effective date. Questions: open an issue at <a href="https://github.com/delfiboyz/PhoenixChat/issues">github.com/delfiboyz/PhoenixChat/issues</a>. The source code is available at <a href="https://github.com/delfiboyz/PhoenixChat">github.com/delfiboyz/PhoenixChat</a> under the GPL-3.0-or-later license.</p>
+  </section>
+
+  <section id="id" lang="id">
+    <h1>Kebijakan Privasi</h1>
+    <p class="meta">Berlaku sejak 26 Oktober 2026 · Untuk Phoenix Chat di Android dan Linux</p>
+
+    <p><strong>Phoenix Chat tidak mengumpulkan data apa pun.</strong> Tidak ada akun, tidak ada server milik pengembang, tidak ada analitik, iklan, atau laporan crash. Semua yang kamu buat di aplikasi tetap di perangkatmu, atau dikirim terenkripsi ujung ke ujung langsung ke kontak yang kamu pilih.</p>
+
+    <h2>Data yang disimpan di perangkatmu</h2>
+    <table>
+      <thead><tr><th>Data</th><th>Tempat</th><th>Siapa yang bisa membaca</th></tr></thead>
+      <tbody>
+        <tr><td>Nama panggilan</td><td>Perangkatmu</td><td>Kamu dan kontak yang kamu tambahkan</td></tr>
+        <tr><td>Kunci identitas dan alamat onion</td><td>Perangkatmu</td><td>Hanya kamu; kunci publik dan alamat dibagikan ke kontak lewat kode kontakmu</td></tr>
+        <tr><td>Kontak, pesan, lampiran</td><td>Perangkatmu</td><td>Kamu dan kontak yang bertukar pesan denganmu</td></tr>
+        <tr><td>Pengaturan (bahasa, PIN, bridge)</td><td>Perangkatmu</td><td>Hanya kamu</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Cara pesan dikirim</h2>
+    <p>Setiap perangkat menjalankan layanan onion Tor sendiri. Pesan dan lampiran dienkripsi di perangkatmu dengan kunci publik penerima, lalu dikirim langsung ke perangkat penerima lewat jaringan Tor. Relay Tor hanya meneruskan data terenkripsi: mereka tidak bisa membaca pesanmu dan tidak tahu siapa berbicara dengan siapa. Pengembang tidak pernah menerima pesan, kontak, atau alamat IP-mu.</p>
+    <p>Jika kontak sedang offline, pesan menunggu di antrean perangkatmu sampai kedua perangkat online. Tidak ada yang disimpan di server pihak ketiga.</p>
+
+    <h2>Izin</h2>
+    <ul>
+      <li><strong>Kamera</strong>: hanya untuk memindai kode QR teman. Gambar diproses di perangkatmu, tidak pernah disimpan atau dikirim.</li>
+      <li><strong>Notifikasi</strong>: untuk menampilkan pesan baru dan status koneksi di latar. Notifikasi dibuat di perangkatmu; tidak memakai layanan push.</li>
+      <li><strong>Internet dan layanan latar</strong>: untuk menjaga koneksi Tor tetap terbuka agar pesan bisa sampai. Bisa dimatikan lewat Mode hemat baterai.</li>
+    </ul>
+
+    <h2>Cadangan</h2>
+    <p>Cadangan hanya dibuat saat kamu memintanya. File cadangan dienkripsi dengan kata sandi pilihanmu, dan kamu yang menentukan tempat menyimpannya. Data aplikasi dikecualikan dari cadangan cloud Android.</p>
+
+    <h2>Menghapus data</h2>
+    <p>Gunakan <strong>Pengaturan → Hapus semua data di perangkat ini</strong>, atau copot aplikasinya. Karena tidak ada server, ini menghapus semuanya; pengembang tidak menyimpan apa pun untuk dihapus. Pesan yang sudah kamu kirim tetap ada di perangkat kontakmu sampai mereka menghapusnya.</p>
+
+    <h2>Anak-anak</h2>
+    <p>Phoenix Chat tidak ditujukan untuk anak di bawah 13 tahun dan tidak mengumpulkan informasi dari siapa pun.</p>
+
+    <h2>Perubahan dan kontak</h2>
+    <p>Perubahan kebijakan ini diumumkan di halaman ini dengan tanggal berlaku baru. Pertanyaan: buat issue di <a href="https://github.com/delfiboyz/PhoenixChat/issues">github.com/delfiboyz/PhoenixChat/issues</a>. Kode sumber tersedia di <a href="https://github.com/delfiboyz/PhoenixChat">github.com/delfiboyz/PhoenixChat</a> dengan lisensi GPL-3.0-or-later.</p>
+  </section>
+</main>
+</body>
+</html>

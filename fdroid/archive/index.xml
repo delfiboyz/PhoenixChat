@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fdroid>
+	<repo icon="icon.png" name="My First F-Droid Archive Demo" pubkey="308204f7308202dfa00302010202082ddff48bd978b921300d06092a864886f70d01010b050030293110300e060355040b1307462d44726f6964311530130603550403130c50686f656e697820436861743020170d3236313032363133303035365a180f32303534303331333133303035365a30293110300e060355040b1307462d44726f6964311530130603550403130c50686f656e6978204368617430820222300d06092a864886f70d01010105000382020f003082020a0282020100b2471488370d7024b97d75e4c42c8f4aa5a7372e9dd7fdc16d0920264e682ef01ed1ce41dd32175dee89d2611d05544f562c1bc668e66be658ebd94bb00f7c5033e713d5c0580787d2d39f7fdcaeefd08e07da1de714f40dd70c15d845a32dcfaa96fa5a0a67150d39335b856c93cf6faee52b92dd1ac3884a4e6dfc77fd164557864940f8259f960309cff88f19da072619e9d3ee2edb522dad1d8e132c9b066180f9dddce29568b552d1ed333434cc3df967f06fb814fb3892ac446d6536e04ac002ff2a2e7a1550f4d7ad0de1e628b4435f705b45f6b2c8047edfb1f88d96c7d414aa5e294c62284d88597f28c472ca3ff3082a7cf12d0c494b818b3b3f13208180baab6473ec786b92970c12befde772da8da10f4f2fdf7849ffd9b56dda1cea9023c31da079ff44eb1b8a7929bf6bc110544bd2f78ac225b84c1a8d53bd309a98efcba7aaa74b39f83d907b85f8c75921637a7b8554ac7570d0e639b670bbcff4e3ce6afabfee4a4c40993dbc7f592f9755e43c1dbf4735dbabef581a71c9c6373f9462576c25824410032d2aa615231d476143215b56092115b4f578f6bbf097108add7b8f94e92d6ac201a26752e01526b2c23aa67d7e91c15a93d717ff92ffe55f394ee19bbb1d48d41e3c156859a463cf08f6176e8b8ab81578b3f0d1e1cd6a956fbb03079655c8eb41a2b2df66fc681a783e12c5ab43ab35da179f0203010001a321301f301d0603551d0e041604142d661c45a7f872f4c7d47ca1a49f739932dd3433300d06092a864886f70d01010b0500038202010066cdeb1ba86b8107acb25c851c2c8d72f49ea2bf36a59eda605f727fc431685da97efea43ccc20ce90b5d5c19a5a09b8c44564fe5ea994bf89e8f481f862e22fcad993232da2912a843aaca9c297f1dddf22ecdd66401060f055f184b5ded0f55a6bbfddb5f3fb3b07dc861d05ab07356774165096f2cb191ec00ffcc3c3396df304d2adc60efc7bb0324dd8e699d9278c16276fa9736b6b2310684e5e65490367e83e3a38f27a411e25a84a7ec972fc987ee8d9658da35c2535d0d4e27e7e8d32ab72963d00ad6ebc9e8d38bbb09e4f7dd88595527b5f90463573b8600330c19bc80a309e01762512eb7f79403acdf778b7b0d6e6d7015e4f4d7a8c5823063fa7ad7c65a8a018ae9b0b0d17373bfc1d2e69557b09dfc72e1acfb8f0b85cfca534ebf69ca3543b76d7eb76299c7bad743fe76b742e1f1e3d5b506aef032288c16d20d39527ac197a26257c19c13bdc401ae631d717025285ea1f4580119a1215c726d998fce810908235246f10932d170efec668b0c8adfd93bad74e22507ea65d09219d9f552a5ed89ac2dba574e16143c4c61067acd0248d1f3b1d128f9a14c329f376864b8abb0475a6135e5e6173aa3286e173aacaee39553b2d8a14f2ffe48aabb8bcc2f7a23bcbcbcc5842e876b5f0bb92302c7528b1fcb98718b9e2fa3e192f13331413ae6c1e9481d1e71ad3bed7d216a6800689604ad8079bbbc77f" timestamp="1793127975" url="https://delfiboyz.github.io/PhoenixChat/fdroid/archive" version="20002">
+		<description>These are the apps that have been archived from the main repo.</description>
+	</repo>
+	<application id="app.chatlokal">
+		<id>app.chatlokal</id>
+		<added>2026-10-26</added>
+		<lastupdated>2026-10-27</lastupdated>
+		<name>Phoenix Chat</name>
+		<summary></summary>
+		<desc>No description available</desc>
+		<license>GPL-3.0-or-later</license>
+		<categories>Internet,Security</categories>
+		<category>Internet</category>
+		<web>https://github.com/delfiboyz/PhoenixChat</web>
+		<source>https://github.com/delfiboyz/PhoenixChat</source>
+		<tracker>https://github.com/delfiboyz/PhoenixChat/issues</tracker>
+		<changelog>https://github.com/delfiboyz/PhoenixChat/releases</changelog>
+		<author>delfiboyz</author>
+		<email>delfiboyz@protonmail.com</email>
+		<marketversion></marketversion>
+		<marketvercode>23</marketvercode>
+		<package>
+			<version>0.2.0</version>
+			<versioncode>23</versioncode>
+			<apkname>PhoenixChat-0.2.0-x86_64.apk</apkname>
+			<hash type="sha256">ac70cae1029a6a7ec54cddfe59ef2e5c8d12c37ab2aa48be44cf9f2a9e45c5cf</hash>
+			<size>38531796</size>
+			<sdkver>26</sdkver>
+			<targetSdkVersion>36</targetSdkVersion>
+			<added>2026-10-26</added>
+			<sig>3820fb6d31a4dc1d53486ce28f7fede3</sig>
+			<permissions>ACCESS_NETWORK_STATE,CAMERA,FOREGROUND_SERVICE,FOREGROUND_SERVICE_SPECIAL_USE,INTERNET,POST_NOTIFICATIONS,app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</permissions>
+			<nativecode>x86_64</nativecode>
+		</package>
+		<package>
+			<version>0.2.0</version>
+			<versioncode>22</versioncode>
+			<apkname>PhoenixChat-0.2.0-arm64-v8a.apk</apkname>
+			<hash type="sha256">5af4cd69b8ebf0deabcad7324f5d46aa5bb3f7842692550a677c44ee9b4bd318</hash>
+			<size>34651584</size>
+			<sdkver>26</sdkver>
+			<targetSdkVersion>36</targetSdkVersion>
+			<added>2026-10-26</added>
+			<sig>3820fb6d31a4dc1d53486ce28f7fede3</sig>
+			<permissions>ACCESS_NETWORK_STATE,CAMERA,FOREGROUND_SERVICE,FOREGROUND_SERVICE_SPECIAL_USE,INTERNET,POST_NOTIFICATIONS,app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</permissions>
+			<nativecode>arm64-v8a</nativecode>
+		</package>
+		<package>
+			<version>0.2.0</version>
+			<versioncode>21</versioncode>
+			<apkname>PhoenixChat-0.2.0-armeabi-v7a.apk</apkname>
+			<hash type="sha256">344780ecad30d6e1fd621cd3455807677b37d3a1810c29c9dc34021d3e5a657e</hash>
+			<size>33235660</size>
+			<sdkver>26</sdkver>
+			<targetSdkVersion>36</targetSdkVersion>
+			<added>2026-10-26</added>
+			<sig>3820fb6d31a4dc1d53486ce28f7fede3</sig>
+			<permissions>ACCESS_NETWORK_STATE,CAMERA,FOREGROUND_SERVICE,FOREGROUND_SERVICE_SPECIAL_USE,INTERNET,POST_NOTIFICATIONS,app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</permissions>
+			<nativecode>armeabi-v7a</nativecode>
+		</package>
+		<package>
+			<version>0.1.0</version>
+			<versioncode>13</versioncode>
+			<apkname>PhoenixChat-0.1.0-x86_64.apk</apkname>
+			<hash type="sha256">babf2f955f0b8077dde9b4f2ae1b272578e24032269ea2d0e45547cc30d3cc4b</hash>
+			<size>38526412</size>
+			<sdkver>26</sdkver>
+			<targetSdkVersion>36</targetSdkVersion>
+			<added>2026-10-26</added>
+			<sig>3820fb6d31a4dc1d53486ce28f7fede3</sig>
+			<permissions>ACCESS_NETWORK_STATE,CAMERA,FOREGROUND_SERVICE,FOREGROUND_SERVICE_SPECIAL_USE,INTERNET,POST_NOTIFICATIONS,app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</permissions>
+			<nativecode>x86_64</nativecode>
+		</package>
+		<package>
+			<version>0.1.0</version>
+			<versioncode>12</versioncode>
+			<apkname>PhoenixChat-0.1.0-arm64-v8a.apk</apkname>
+			<hash type="sha256">76bd7baf26054b0bf53c85b81beba9c58c5b36ba1f82d7ea3dde9aec64bfd799</hash>
+			<size>34646200</size>
+			<sdkver>26</sdkver>
+			<targetSdkVersion>36</targetSdkVersion>
+			<added>2026-10-26</added>
+			<sig>3820fb6d31a4dc1d53486ce28f7fede3</sig>
+			<permissions>ACCESS_NETWORK_STATE,CAMERA,FOREGROUND_SERVICE,FOREGROUND_SERVICE_SPECIAL_USE,INTERNET,POST_NOTIFICATIONS,app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</permissions>
+			<nativecode>arm64-v8a</nativecode>
+		</package>
+		<package>
+			<version>0.1.0</version>
+			<versioncode>11</versioncode>
+			<apkname>PhoenixChat-0.1.0-armeabi-v7a.apk</apkname>
+			<hash type="sha256">f52cc4d019a8c5b58c41d239d21432cf2dc0afb5e879e0775358c6eb89aabd7f</hash>
+			<size>33230276</size>
+			<sdkver>26</sdkver>
+			<targetSdkVersion>36</targetSdkVersion>
+			<added>2026-10-26</added>
+			<sig>3820fb6d31a4dc1d53486ce28f7fede3</sig>
+			<permissions>ACCESS_NETWORK_STATE,CAMERA,FOREGROUND_SERVICE,FOREGROUND_SERVICE_SPECIAL_USE,INTERNET,POST_NOTIFICATIONS,app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION</permissions>
+			<nativecode>armeabi-v7a</nativecode>
+		</package>
+	</application>
+</fdroid>

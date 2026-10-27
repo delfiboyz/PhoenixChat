@@ -1,0 +1,158 @@
+{
+  "repo": {
+    "timestamp": 1793127981000
+  },
+  "packages": {
+    "app.chatlokal": {
+      "metadata": {
+        "lastUpdated": 1793127962000
+      },
+      "versions": {
+        "ac70cae1029a6a7ec54cddfe59ef2e5c8d12c37ab2aa48be44cf9f2a9e45c5cf": null,
+        "5af4cd69b8ebf0deabcad7324f5d46aa5bb3f7842692550a677c44ee9b4bd318": null,
+        "344780ecad30d6e1fd621cd3455807677b37d3a1810c29c9dc34021d3e5a657e": null,
+        "e63eb7d35190f1be220c61d5673db1ee7120c8ec2049e33f1dfc6af0f5e9f07d": {
+          "added": 1793127962000,
+          "file": {
+            "name": "/PhoenixChat-0.2.1-x86_64.apk",
+            "sha256": "e63eb7d35190f1be220c61d5673db1ee7120c8ec2049e33f1dfc6af0f5e9f07d",
+            "size": 38531796
+          },
+          "manifest": {
+            "nativecode": [
+              "x86_64"
+            ],
+            "versionName": "0.2.1",
+            "versionCode": 33,
+            "usesSdk": {
+              "minSdkVersion": 26,
+              "targetSdkVersion": 36
+            },
+            "signer": {
+              "sha256": [
+                "dd9178ba552770128ee27ef6b3d8aa71f96f1235235c1e84c7808d1138cb2b1c"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "android.permission.INTERNET"
+              },
+              {
+                "name": "android.permission.ACCESS_NETWORK_STATE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+              },
+              {
+                "name": "android.permission.POST_NOTIFICATIONS"
+              },
+              {
+                "name": "android.permission.CAMERA"
+              },
+              {
+                "name": "app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              }
+            ]
+          }
+        },
+        "d4606d94ba5a8f576cd8843cc99e4d7fc62c0355d2d4d31322e54adbd5542089": {
+          "added": 1793127961000,
+          "file": {
+            "name": "/PhoenixChat-0.2.1-arm64-v8a.apk",
+            "sha256": "d4606d94ba5a8f576cd8843cc99e4d7fc62c0355d2d4d31322e54adbd5542089",
+            "size": 34651584
+          },
+          "manifest": {
+            "nativecode": [
+              "arm64-v8a"
+            ],
+            "versionName": "0.2.1",
+            "versionCode": 32,
+            "usesSdk": {
+              "minSdkVersion": 26,
+              "targetSdkVersion": 36
+            },
+            "signer": {
+              "sha256": [
+                "dd9178ba552770128ee27ef6b3d8aa71f96f1235235c1e84c7808d1138cb2b1c"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "android.permission.INTERNET"
+              },
+              {
+                "name": "android.permission.ACCESS_NETWORK_STATE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+              },
+              {
+                "name": "android.permission.POST_NOTIFICATIONS"
+              },
+              {
+                "name": "android.permission.CAMERA"
+              },
+              {
+                "name": "app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              }
+            ]
+          }
+        },
+        "f51e52b39f4a8f85090f00b313e6de3e616b7760715c8f19c3f843d166843d70": {
+          "added": 1793127962000,
+          "file": {
+            "name": "/PhoenixChat-0.2.1-armeabi-v7a.apk",
+            "sha256": "f51e52b39f4a8f85090f00b313e6de3e616b7760715c8f19c3f843d166843d70",
+            "size": 33235660
+          },
+          "manifest": {
+            "nativecode": [
+              "armeabi-v7a"
+            ],
+            "versionName": "0.2.1",
+            "versionCode": 31,
+            "usesSdk": {
+              "minSdkVersion": 26,
+              "targetSdkVersion": 36
+            },
+            "signer": {
+              "sha256": [
+                "dd9178ba552770128ee27ef6b3d8aa71f96f1235235c1e84c7808d1138cb2b1c"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "android.permission.INTERNET"
+              },
+              {
+                "name": "android.permission.ACCESS_NETWORK_STATE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+              },
+              {
+                "name": "android.permission.POST_NOTIFICATIONS"
+              },
+              {
+                "name": "android.permission.CAMERA"
+              },
+              {
+                "name": "app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

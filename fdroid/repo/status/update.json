@@ -1,0 +1,38 @@
+{
+  "/etc/issue.net": "Parrot Security 7.4",
+  "antiFeatures": {},
+  "apksigner": "/usr/bin/apksigner",
+  "archivePolicy0": [],
+  "commandLine": [
+    "/tmp/claude-1000/-home-anonymous-Documents-development-PhoenixChat/f7fdda31-fa79-42c7-85da-9e9036b0893b/scratchpad/fdvenv/bin/fdroid update",
+    "--pretty"
+  ],
+  "disabled": [],
+  "endTimestamp": 1793127988182,
+  "failedBuilds": {},
+  "jarsigner": "/usr/lib/jvm/java-25-openjdk-amd64/bin/jarsigner",
+  "keytool": "/usr/lib/jvm/java-25-openjdk-amd64/bin/keytool",
+  "needsUpdate": [
+    "app.chatlokal"
+  ],
+  "noPackages": [
+    "app.chatlokal"
+  ],
+  "noUpdateCheck": [
+    "app.chatlokal"
+  ],
+  "stages": {
+    "archive_old_apks archive": 1793127975187,
+    "delete_disabled_builds": 1793127975185,
+    "index.make archive": 1793127975189,
+    "index.make repo": 1793127981256,
+    "prepare_apps archive": 1793127975188,
+    "prepare_apps repo": 1793127981180,
+    "process_apks": 1793127975185,
+    "read_added_date_from_all_apks": 1793127975187,
+    "remove_apks": 1793127975187,
+    "scan_repo_files": 1793127975186
+  },
+  "startTimestamp": 1793102775000,
+  "subcommand": "update"
+}

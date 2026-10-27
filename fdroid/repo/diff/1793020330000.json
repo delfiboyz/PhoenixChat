@@ -1,0 +1,162 @@
+{
+  "repo": {
+    "timestamp": 1793127981000
+  },
+  "packages": {
+    "app.chatlokal": {
+      "metadata": {
+        "lastUpdated": 1793127962000,
+        "description": {
+          "en-US": "Phoenix Chat lets you chat without an account, a phone number, or an email address. Your identity is a random key created on your device, your messages are stored only on your devices, and they travel directly between devices over the Tor network.\n\n<b>How it works</b>\n<ul>\n<li>Each device runs its own Tor onion service. Messages go straight to your friend's device, end-to-end encrypted, and your IP address stays hidden.</li>\n<li>There is no user directory. You add a contact by scanning their QR code or pasting their code, and you approve every new contact.</li>\n<li>When a friend is offline, messages wait in a queue on your device and are delivered automatically when you are both online.</li>\n<li>Status labels tell you where each message is: <i>Saved locally</i>, <i>Queued</i>, <i>Sent</i>, or <i>Read</i>.</li>\n</ul>\n\n<b>Features</b>\n<ul>\n<li>Attachments with a size limit you choose.</li>\n<li>Password-encrypted backups you can restore on a new device (also works with the Linux desktop app).</li>\n<li>PIN lock, automatic deletion after 30 days, optional read receipts.</li>\n<li>Tor route: see the relays your messages pass through (guard, middle relay, and rendezvous point) with their IP and country, plus who sees what. Your ISP only sees the Tor guard's IP, and chats over .onion addresses never use an exit node.</li>\n<li>obfs4 and Snowflake bridges for networks that block Tor.</li>\n<li>Battery saver: turn off background Tor if you only want messages while the app is open.</li>\n<li>English and Indonesian, dark theme.</li>\n</ul>\n\n<b>Good to know</b>\nBecause there is no server, there is no account recovery. If you lose your device without a backup, your messages are gone. Messages are received only while Phoenix Chat is running; with battery saver off, a foreground notification keeps Tor running in the background.\n",
+          "id": "Phoenix Chat memungkinkan kamu mengobrol tanpa akun, nomor HP, atau email. Identitasmu adalah kunci acak yang dibuat di perangkat, pesan hanya disimpan di perangkatmu, dan dikirim langsung antar perangkat lewat jaringan Tor.\n\n<b>Cara kerja</b>\n<ul>\n<li>Setiap perangkat menjalankan layanan onion Tor sendiri. Pesan langsung menuju perangkat temanmu, terenkripsi ujung ke ujung, dan alamat IP-mu tetap tersembunyi.</li>\n<li>Tidak ada direktori pengguna. Kontak ditambahkan dengan memindai kode QR atau menempel kode, dan setiap kontak baru harus kamu setujui.</li>\n<li>Saat teman offline, pesan menunggu di antrean perangkatmu dan terkirim otomatis begitu kalian sama-sama online.</li>\n<li>Label status menunjukkan posisi setiap pesan: <i>Tersimpan lokal</i>, <i>Antre</i>, <i>Terkirim</i>, atau <i>Dibaca</i>.</li>\n</ul>\n\n<b>Fitur</b>\n<ul>\n<li>Lampiran dengan batas ukuran yang kamu atur sendiri.</li>\n<li>Cadangan terenkripsi kata sandi yang bisa dipulihkan di perangkat baru (juga di aplikasi desktop Linux).</li>\n<li>Kunci PIN, hapus otomatis setelah 30 hari, tanda \"Dibaca\" opsional.</li>\n<li>Rute Tor: lihat relay yang dilewati pesanmu (gerbang, relay tengah, dan titik temu) lengkap dengan IP dan negaranya, plus penjelasan siapa melihat apa. ISP-mu hanya melihat IP gerbang Tor, dan chat lewat alamat .onion tidak pernah memakai exit node.</li>\n<li>Bridge obfs4 dan Snowflake untuk jaringan yang memblokir Tor.</li>\n<li>Mode hemat baterai: matikan Tor di latar jika pesan cukup diterima saat aplikasi terbuka.</li>\n<li>Bahasa Indonesia dan Inggris, tampilan gelap.</li>\n</ul>\n\n<b>Perlu diketahui</b>\nKarena tidak ada server, tidak ada pemulihan akun. Jika perangkat hilang tanpa cadangan, pesanmu ikut hilang. Pesan hanya diterima selama Phoenix Chat berjalan; dengan mode hemat baterai mati, notifikasi layanan menjaga Tor tetap aktif di latar.\n"
+        }
+      },
+      "versions": {
+        "babf2f955f0b8077dde9b4f2ae1b272578e24032269ea2d0e45547cc30d3cc4b": null,
+        "76bd7baf26054b0bf53c85b81beba9c58c5b36ba1f82d7ea3dde9aec64bfd799": null,
+        "f52cc4d019a8c5b58c41d239d21432cf2dc0afb5e879e0775358c6eb89aabd7f": null,
+        "e63eb7d35190f1be220c61d5673db1ee7120c8ec2049e33f1dfc6af0f5e9f07d": {
+          "added": 1793127962000,
+          "file": {
+            "name": "/PhoenixChat-0.2.1-x86_64.apk",
+            "sha256": "e63eb7d35190f1be220c61d5673db1ee7120c8ec2049e33f1dfc6af0f5e9f07d",
+            "size": 38531796
+          },
+          "manifest": {
+            "nativecode": [
+              "x86_64"
+            ],
+            "versionName": "0.2.1",
+            "versionCode": 33,
+            "usesSdk": {
+              "minSdkVersion": 26,
+              "targetSdkVersion": 36
+            },
+            "signer": {
+              "sha256": [
+                "dd9178ba552770128ee27ef6b3d8aa71f96f1235235c1e84c7808d1138cb2b1c"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "android.permission.INTERNET"
+              },
+              {
+                "name": "android.permission.ACCESS_NETWORK_STATE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+              },
+              {
+                "name": "android.permission.POST_NOTIFICATIONS"
+              },
+              {
+                "name": "android.permission.CAMERA"
+              },
+              {
+                "name": "app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              }
+            ]
+          }
+        },
+        "d4606d94ba5a8f576cd8843cc99e4d7fc62c0355d2d4d31322e54adbd5542089": {
+          "added": 1793127961000,
+          "file": {
+            "name": "/PhoenixChat-0.2.1-arm64-v8a.apk",
+            "sha256": "d4606d94ba5a8f576cd8843cc99e4d7fc62c0355d2d4d31322e54adbd5542089",
+            "size": 34651584
+          },
+          "manifest": {
+            "nativecode": [
+              "arm64-v8a"
+            ],
+            "versionName": "0.2.1",
+            "versionCode": 32,
+            "usesSdk": {
+              "minSdkVersion": 26,
+              "targetSdkVersion": 36
+            },
+            "signer": {
+              "sha256": [
+                "dd9178ba552770128ee27ef6b3d8aa71f96f1235235c1e84c7808d1138cb2b1c"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "android.permission.INTERNET"
+              },
+              {
+                "name": "android.permission.ACCESS_NETWORK_STATE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+              },
+              {
+                "name": "android.permission.POST_NOTIFICATIONS"
+              },
+              {
+                "name": "android.permission.CAMERA"
+              },
+              {
+                "name": "app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              }
+            ]
+          }
+        },
+        "f51e52b39f4a8f85090f00b313e6de3e616b7760715c8f19c3f843d166843d70": {
+          "added": 1793127962000,
+          "file": {
+            "name": "/PhoenixChat-0.2.1-armeabi-v7a.apk",
+            "sha256": "f51e52b39f4a8f85090f00b313e6de3e616b7760715c8f19c3f843d166843d70",
+            "size": 33235660
+          },
+          "manifest": {
+            "nativecode": [
+              "armeabi-v7a"
+            ],
+            "versionName": "0.2.1",
+            "versionCode": 31,
+            "usesSdk": {
+              "minSdkVersion": 26,
+              "targetSdkVersion": 36
+            },
+            "signer": {
+              "sha256": [
+                "dd9178ba552770128ee27ef6b3d8aa71f96f1235235c1e84c7808d1138cb2b1c"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "android.permission.INTERNET"
+              },
+              {
+                "name": "android.permission.ACCESS_NETWORK_STATE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+              },
+              {
+                "name": "android.permission.POST_NOTIFICATIONS"
+              },
+              {
+                "name": "android.permission.CAMERA"
+              },
+              {
+                "name": "app.chatlokal.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
