@@ -1,5 +1,7 @@
 # Phoenix Chat
 
+**Bahasa Indonesia** · [English](README.en.md)
+
 Phoenix Chat adalah aplikasi chat tanpa akun dan tanpa database, dengan tampilan gelap dan logo phoenix. Identitas adalah kunci acak yang dibuat di perangkat, semua data tersimpan sebagai file lokal, dan pesan dikirim langsung antar perangkat lewat layanan onion Tor dengan enkripsi ujung ke ujung.
 
 Desain mengikuti canvas "Desain Aplikasi Chat Lokal" (5 layar) dan arsitektur mengikuti "Dokumen Desain — Chat Lokal". Ada dua versi dengan protokol yang sama, jadi penggunanya bisa saling mengobrol: aplikasi desktop (Electron, `server/`) dan aplikasi Android (Kotlin, `android/`). Keduanya memakai antarmuka React yang sama (`src/`).
@@ -8,15 +10,15 @@ Desain mengikuti canvas "Desain Aplikasi Chat Lokal" (5 layar) dan arsitektur me
 
 <table>
 <tr>
-<td align="center" width="25%"><img src="docs/screenshots/1-mulai.png" alt="Mulai: buat identitas tanpa akun" width="200"><br><sub>Mulai: buat identitas tanpa akun</sub></td>
-<td align="center" width="25%"><img src="docs/screenshots/2-obrolan.png" alt="Daftar obrolan" width="200"><br><sub>Daftar obrolan</sub></td>
-<td align="center" width="25%"><img src="docs/screenshots/3-ruang-obrolan.png" alt="Ruang obrolan" width="200"><br><sub>Ruang obrolan</sub></td>
-<td align="center" width="25%"><img src="docs/screenshots/7-permintaan.png" alt="Permintaan kontak baru" width="200"><br><sub>Permintaan kontak baru</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/id/1-start.png" alt="Mulai: buat identitas tanpa akun" width="200"><br><sub>Mulai: buat identitas tanpa akun</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/id/2-chats.png" alt="Daftar obrolan" width="200"><br><sub>Daftar obrolan</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/id/3-chat.png" alt="Ruang obrolan" width="200"><br><sub>Ruang obrolan</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/id/7-request.png" alt="Permintaan kontak baru" width="200"><br><sub>Permintaan kontak baru</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><img src="docs/screenshots/4-tambah-kontak.png" alt="Tambah kontak dengan kode QR" width="200"><br><sub>Tambah kontak dengan kode QR</sub></td>
-<td align="center" width="25%"><img src="docs/screenshots/5-pengaturan.png" alt="Pengaturan" width="200"><br><sub>Pengaturan</sub></td>
-<td align="center" width="25%"><img src="docs/screenshots/6-rute-tor.png" alt="Rute Tor: relay yang dilewati pesan" width="200"><br><sub>Rute Tor: relay yang dilewati pesan</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/id/4-add-contact.png" alt="Tambah kontak dengan kode QR" width="200"><br><sub>Tambah kontak dengan kode QR</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/id/5-settings.png" alt="Pengaturan" width="200"><br><sub>Pengaturan</sub></td>
+<td align="center" width="25%"><img src="docs/screenshots/id/6-tor-route.png" alt="Rute Tor: relay yang dilewati pesan" width="200"><br><sub>Rute Tor: relay yang dilewati pesan</sub></td>
 </tr>
 </table>
 
@@ -115,12 +117,13 @@ electron/main.cjs      jendela desktop; menolak navigasi ke luar antarmuka lokal
 server/index.js        menyalakan Core + dua server HTTP lokal
 server/core.js         identitas, kontak, pesan, antrean, lampiran, cadangan
 server/tor.js          proses tor sendiri + layanan onion v3 (HiddenServiceDir)
+server/torctl.js       klien kecil port kontrol Tor (membaca sirkuit untuk layar Rute Tor)
 server/transport.js    kirim ke .onion lewat SOCKS Tor
 server/http.js         server peer (hanya /ping dan /inbox, dipetakan ke onion)
                        server UI (127.0.0.1, butuh token, melayani React + API + SSE)
 server/crypto.js       nacl.box E2E, ID perangkat, kode kontak, enkripsi cadangan
 server/store.js        file JSON lokal, ditulis atomik
-src/                   antarmuka React: Mulai, Obrolan, Ruang obrolan, Tambah kontak, Pengaturan
+src/                   antarmuka React: Mulai, Obrolan, Ruang obrolan, Tambah kontak, Pengaturan, Rute Tor
 ```
 
 - **Identitas**: pasangan kunci X25519 (nacl.box) untuk enkripsi, plus kunci layanan onion yang dibuat tor. ID yang ditampilkan (mis. `7F3A-91C2-B04E`) adalah ringkasan alamat .onion.
@@ -128,6 +131,7 @@ src/                   antarmuka React: Mulai, Obrolan, Ruang obrolan, Tambah ko
 - **Pesan**: dienkripsi `nacl.box` lalu dikirim ke `/inbox` perangkat teman lewat Tor. Balasan HTTP 200 = *Terkirim*; tanda baca kembali sebagai pesan terenkripsi = *Dibaca*.
 - **Antrean**: pesan untuk teman offline tetap di `outbox.json` pengirim dengan status *Antre*, dicoba ulang dengan jeda bertingkat dan langsung dikirim begitu teman terlihat online. Tidak ada relay pihak ketiga.
 - **Lampiran**: pengirim menawarkan; penerima mengunduh otomatis jika di bawah batas yang diatur di Pengaturan, selebihnya lewat tombol *Unduh*.
+- **Rute Tor**: layar Rute Tor membaca `circuit-status` dari port kontrol Tor dan menampilkan relay yang dipakai perangkat ini (gerbang, relay tengah, titik temu) beserta IP dan negaranya, juga apa yang bisa dilihat ISP dan tiap relay. Chat ke alamat .onion tidak pernah keluar dari jaringan Tor, jadi tidak ada exit node.
 - **Cadangan**: satu file berisi kunci, kontak, pesan, dan lampiran, dienkripsi AES-256-GCM dengan kunci dari scrypt(kata sandi).
 - **Bahasa**: Indonesia dan Inggris, dipilih di layar Mulai (tebakan awal dari bahasa sistem) dan bisa diganti di Pengaturan. Pilihan disimpan sebagai pengaturan `lang` di perangkat, jadi pesan galat, status Tor, dan notifikasi ikut bahasa itu. Kamus antarmuka ada di `src/i18n.js`, pesan server di `server/i18n.js` dan `android/.../core/I18n.kt`.
 - **Nama dan pengenal teknis**: nama yang terlihat adalah *Phoenix Chat*, tetapi skema kode kontak `chatlokal:`, ID paket Android `app.chatlokal`, dan format cadangan tetap, sehingga kode kontak, cadangan, dan instalasi lama tetap berlaku.
