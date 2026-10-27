@@ -13,6 +13,7 @@ Phoenix Chat memungkinkan kamu mengobrol tanpa akun, nomor HP, atau email. Ident
 <li>Lampiran dengan batas ukuran yang kamu atur sendiri.</li>
 <li>Cadangan terenkripsi kata sandi yang bisa dipulihkan di perangkat baru (juga di aplikasi desktop Linux).</li>
 <li>Kunci PIN, hapus otomatis setelah 30 hari, tanda "Dibaca" opsional.</li>
+<li>Rute Tor: lihat relay yang dilewati pesanmu (gerbang, relay tengah, dan titik temu) lengkap dengan IP dan negaranya, plus penjelasan siapa melihat apa. ISP-mu hanya melihat IP gerbang Tor, dan chat lewat alamat .onion tidak pernah memakai exit node.</li>
 <li>Bridge obfs4 dan Snowflake untuk jaringan yang memblokir Tor.</li>
 <li>Mode hemat baterai: matikan Tor di latar jika pesan cukup diterima saat aplikasi terbuka.</li>
 <li>Bahasa Indonesia dan Inggris, tampilan gelap.</li>

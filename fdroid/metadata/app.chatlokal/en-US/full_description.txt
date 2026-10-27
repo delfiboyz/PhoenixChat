@@ -13,6 +13,7 @@ Phoenix Chat lets you chat without an account, a phone number, or an email addre
 <li>Attachments with a size limit you choose.</li>
 <li>Password-encrypted backups you can restore on a new device (also works with the Linux desktop app).</li>
 <li>PIN lock, automatic deletion after 30 days, optional read receipts.</li>
+<li>Tor route: see the relays your messages pass through (guard, middle relay, and rendezvous point) with their IP and country, plus who sees what. Your ISP only sees the Tor guard's IP, and chats over .onion addresses never use an exit node.</li>
 <li>obfs4 and Snowflake bridges for networks that block Tor.</li>
 <li>Battery saver: turn off background Tor if you only want messages while the app is open.</li>
 <li>English and Indonesian, dark theme.</li>
